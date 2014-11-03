@@ -15,33 +15,22 @@ def index():
     '''
      #Read in a coordinates file and print out the distance matrix for that file
     coord_file = open("cities10.txt")
-    city_list = [0, 2, 3, 4, 5]
     n = .1
 
-    city_coords = tsp.read_coords(coord_file)
-    dist_matrix = tsp.cartesian_matrix(city_coords)
-    tsp.print_nice_matrix(dist_matrix)
+    coords = tsp.read_coords(coord_file)
+    matrix = tsp.cartesian_matrix(coords)
 
-    #Print the length of any particular route
-    
-    a_route_length = tsp.tour_length(dist_matrix, city_list)
-    print a_route_length
-
-    #Print all permutations where exactly 2 cities in a list are swapped.
-    for tour in tsp.swapped_cities(city_list):
-        print tour
-        pass
-
-    print "***********"
-
-    #Print all permutations where exactly 2 edges in a list are swapped.
-    for tour in tsp.reversed_sections(city_list):
-        print tour
-        pass
+    #We begin our hill climb
+    init_function =lambda: tsp.init_random_tour(len(coords))
+    objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
+    result = tsp.hillclimb(init_function, tsp.reversed_sections, 
+        objective_function, 100)
+    num_evaluations, best_score, best = result
 
     #write to an image file
-    tsp.write_tour_to_img(city_coords, city_list, n, "static/img/plot.png")
-    return render_template("index.html")
+    tsp.write_tour_to_img(coords, best, n, "static/img/plot.png")
+    return render_template("index.html", num_evaluations = num_evaluations,
+        best_score = best_score, best = best)
 
 
 if __name__ == "__main__":
