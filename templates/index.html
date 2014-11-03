@@ -1,12 +1,45 @@
 <html>
 <head>
     <title>TSP visualization</title>
+    <link rel="stylesheet" type="text/css" href="static/css/main.css">
 </head>
 <body>
     <h1>Results with simple Hill Climb Algorithm</h1>
     <img src = "/static/img/plot.png">
-    <h2>Number of iterations = {{num_evaluations}} </h2>
-    <h2>Best Score = {{ -1 * best_score }}</h2>
-    <h2>Best Route = {{ best }}</h2>
+
+    <div class = "right">
+        <div class = "user_input">
+        <h2>Input</h2>
+        <form method="post" action="/">
+            <label for="data">Data set</label>
+            <select id="data">
+                <option value="cities10.txt">10 US cities</option>
+                <option value="cities48.txt">48 US cities</option>
+            </select>
+            <br>
+            <label for="scaling">Scaling factor</label>
+            <input type="text" id="scaling">
+            <br>
+            <label for="algorithm">Algorithm</label>
+            <select id="algorithm">
+                <option value="hillclimb">Basic Hillclimb</option>
+                <option value="hillclimb and restart">Hillclimb and restart</option>
+            </select>
+            <br>
+            <label for="cycles">Max. iterations</label>
+            <input type="text" id="cycles">
+            <br>
+            <button type="submit">Give it a spin<submit>
+        </form>
+        </div>
+
+        <div class = "results">
+        <h2>Results</h2>
+        <h3>Number of iterations = {{num_evaluations}} </h3>
+        <h3>Best Score = {{ -1 * best_score }}</h3>
+        <h3>Best Route = {{ best }}</h3>
+        </div>
+    </div>
+
 </body>
 </html>

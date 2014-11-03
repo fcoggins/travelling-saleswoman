@@ -168,4 +168,32 @@ def hillclimb(
     
     return (num_evaluations,best_score,best)
 
+def hillclimb_and_restart(
+    init_function,
+    move_operator,
+    objective_function,
+    max_evaluations):
+    '''
+    repeatedly hillclimb until max_evaluations is reached
+    '''
+    best=None
+    best_score=0
+    
+    num_evaluations=0
+    while num_evaluations < max_evaluations:
+        remaining_evaluations=max_evaluations-num_evaluations
+        
+        evaluated,score,found=hillclimb(
+            init_function,
+            move_operator,
+            objective_function,
+            remaining_evaluations)
+        
+        num_evaluations+=evaluated
+        if score > best_score or best is None:
+            best_score=score
+            best=found
+        
+    return (num_evaluations,best_score,best)
+
 

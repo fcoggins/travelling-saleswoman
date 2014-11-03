@@ -14,8 +14,8 @@ def index():
       TO DO: generate distances using map data
     '''
      #Read in a coordinates file and print out the distance matrix for that file
-    coord_file = open("cities10.txt")
-    n = .1
+    coord_file = open("cities48.txt")
+    n = .09
 
     coords = tsp.read_coords(coord_file)
     matrix = tsp.cartesian_matrix(coords)
@@ -23,8 +23,10 @@ def index():
     #We begin our hill climb
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
-    result = tsp.hillclimb(init_function, tsp.reversed_sections, 
-        objective_function, 100)
+    #result = tsp.hillclimb(init_function, tsp.reversed_sections, 
+        # objective_function, 1000)
+    result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
+        objective_function, 4000)
     num_evaluations, best_score, best = result
 
     #write to an image file
