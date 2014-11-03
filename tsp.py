@@ -89,8 +89,15 @@ def reversed_sections(tour):
                 yield copy
 
 def write_tour_to_img(coords,tour,img_file):
+
+    #scale coordinates
+    n = 0.2
+    coords=[(x*n,y*n) for (x,y) in coords]
+
+    num_cities=len(tour)
+
     padding=20
-    # shift all coords in a bit
+    # shift all coords in a bit and scale by n
     coords=[(x+padding,y+padding) for (x,y) in coords]
     maxx,maxy=0,0
     for x,y in coords:
@@ -102,7 +109,7 @@ def write_tour_to_img(coords,tour,img_file):
     
     font=ImageFont.load_default()
     d=ImageDraw.Draw(img);
-    num_cities=len(tour)
+    
     for i in range(num_cities):
         j=(i+1)%num_cities
         city_i=tour[i]
@@ -119,38 +126,4 @@ def write_tour_to_img(coords,tour,img_file):
     del d
     img.save(img_file, "PNG")
 
-def main():
-    '''cities are entered as tuples of x and y coordinates. 
-	  TO DO: generate random points.
-	  TO DO: generate distances using map data
-    '''
-    
-    #Read in a coordinates file and print out the distance matrix for that file
-    coord_file = open("cities10.txt")
-    city_coords = read_coords(coord_file)
-    dist_matrix = cartesian_matrix(city_coords)
-    print_nice_matrix(dist_matrix)
-
-    #Print the length of any particular route
-    city_list = [0, 1, 2, 3, 4, 5, 6, 7]
-    a_route_length = tour_length(dist_matrix, city_list)
-    print a_route_length
-
-    #Print all permutations where exactly 2 cities in a list are swapped.
-    for tour in swapped_cities(city_list):
-        print tour
-        pass
-
-    print "***********"
-
-    #Print all permutations where exactly 2 edges in a list are swapped.
-    for tour in reversed_sections(city_list):
-        print tour
-        pass
-
-    #write to an image file
-    write_tour_to_img(city_coords, city_list, "plot.png")
-
-if __name__ == "__main__":
-    main()
 
