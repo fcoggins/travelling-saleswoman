@@ -88,10 +88,9 @@ def reversed_sections(tour):
             if copy != tour: # no point returning the same tour
                 yield copy
 
-def write_tour_to_img(coords,tour,img_file):
+def write_tour_to_img(coords,tour, n, img_file):
 
-    #scale coordinates
-    n = 0.2
+    #scale coordinates by n
     coords=[(x*n,y*n) for (x,y) in coords]
 
     num_cities=len(tour)
