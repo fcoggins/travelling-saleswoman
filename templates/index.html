@@ -5,41 +5,42 @@
 </head>
 <body>
     <h1>Results with simple Hill Climb Algorithm</h1>
-    <img src = "/static/img/plot.png">
+    <img src="" id = "plot">
 
     <div class = "right">
         <div class = "user_input">
         <h2>Input</h2>
-        <form method="post" action="/">
+        <form id="userinput">
             <label for="data">Data set</label>
-            <select id="data">
+            <select id="data" name="data">
                 <option value="cities10.txt">10 US cities</option>
                 <option value="cities48.txt">48 US cities</option>
             </select>
             <br>
             <label for="scaling">Scaling factor</label>
-            <input type="text" id="scaling">
+            <input type="text" id="scaling" name="scaling" value = "0.09">
             <br>
             <label for="algorithm">Algorithm</label>
-            <select id="algorithm">
+            <select id="algorithm" name="algorithm">
                 <option value="hillclimb">Basic Hillclimb</option>
                 <option value="hillclimb and restart">Hillclimb and restart</option>
             </select>
             <br>
             <label for="cycles">Max. iterations</label>
-            <input type="text" id="cycles">
+            <input type="text" id="cycles" name="cycles" value = "100">
             <br>
-            <button type="submit">Give it a spin<submit>
+            <button type="submit" id="submitbutton">Give it a spin<submit>
         </form>
         </div>
 
         <div class = "results">
         <h2>Results</h2>
-        <h3>Number of iterations = {{num_evaluations}} </h3>
-        <h3>Best Score = {{ -1 * best_score }}</h3>
-        <h3>Best Route = {{ best }}</h3>
+        <h3>Number of iterations = <span id = "number"></span> </h3>
+        <h3>Best Score = <span id = "score"></span></h3>
+        <h3>Best Route = <span id = "route"></span></h3>
         </div>
     </div>
-
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/static/js/tsp.js"></script>
 </body>
 </html>

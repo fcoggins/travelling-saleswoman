@@ -90,6 +90,10 @@ def reversed_sections(tour):
 
 def write_tour_to_img(coords,tour, n, img_file):
 
+    
+
+    print "From write_tour_to_img function", img_file
+
     #scale coordinates by n
     coords=[(x*n,y*n) for (x,y) in coords]
 
@@ -124,7 +128,6 @@ def write_tour_to_img(coords,tour, n, img_file):
         d.ellipse((x-5,y-5,x+5,y+5),outline=(0,0,0),fill=(196,196,196))
     del d
     img.save(img_file, "PNG")
-
 
 def init_random_tour(tour_length):
     '''Takes tour length as an arguement and returns a random tour'''
