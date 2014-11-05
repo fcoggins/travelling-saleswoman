@@ -47,7 +47,7 @@ def get_parameters():
 
     #return results as JSON
 
-    results = {"iterations" : cycles, "best_score" : best_score, "route" : best,
+    results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
     "img_file" : img_file}
     data = json.dumps(results)
     return data
