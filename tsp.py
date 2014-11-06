@@ -1,4 +1,4 @@
-import math, random
+import math, random, logging
 from PIL import Image, ImageFont, ImageDraw
 
 def read_coords(coord_file):
@@ -90,10 +90,6 @@ def reversed_sections(tour):
 
 def write_tour_to_img(coords,tour, n, img_file):
 
-    
-
-    print "From write_tour_to_img function", img_file
-
     #scale coordinates by n
     coords=[(x*n,y*n) for (x,y) in coords]
 
@@ -148,6 +144,8 @@ def hillclimb(
     best_score=objective_function(best)
     
     num_evaluations=1
+
+    logging.info('hillclimb started: score=%f',best_score)
     
     while num_evaluations < max_evaluations:
         # examine moves around our current position
@@ -168,7 +166,7 @@ def hillclimb(
         if not move_made:
             break # we couldn't find a better move 
                      # (must be at a local maximum)
-    
+    logging.info('hillclimb finished: num_evaluations=%d, best_score=%f',num_evaluations,best_score)
     return (num_evaluations,best_score,best)
 
 def hillclimb_and_restart(

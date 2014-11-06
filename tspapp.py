@@ -52,6 +52,12 @@ def get_parameters():
     data = json.dumps(results)
     return data
 
+@app.route("/maptutorial")
+def maptutorial():
+    """Return the map tutorial page"""  
+    return render_template("maptutorial.html")
+
+
 
 if __name__ == "__main__":
 
