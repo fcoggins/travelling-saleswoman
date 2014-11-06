@@ -1,6 +1,6 @@
-from flask import Flask, request, session, render_template, g, redirect, url_for, flash
+from flask import Flask, request, session as fsksession, render_template, g, redirect, url_for, flash
 import os, jinja2, random, string, json
-import tsp
+import tsp, model
 
 app = Flask(__name__)
 app.secret_key = '\xf5!\x07!qj\xa4\x08\xc6\xf8\n\x8a\x95m\xe2\x04g\xbb\x98|U\xa2f\x03'
@@ -11,16 +11,49 @@ def index():
     """Return the index page"""  
     return render_template("index.html")
 
+@app.route("/index2")
+def index2():
+    """Now let's add the map to the page"""
+    #pulling stuff from database, the two statements below actually need to
+    #happen later when processing the form input
+
+    #nodes = model.session.query(model.City).all()
+    #tsp.read_coords_db(nodes)
+
+    return render_template("index2.html")
+
+
+
+@app.route("/get_cities_data", methods=['GET'])
+def get_cities_data():
+    """returns list of cities + lat long as json, like:
+    [ ("Annapolis", 34, 5), ("Austin", 2, 4)]
+    """
+    nodes = model.session.query(model.City).all()
+    print len(nodes)
+    city_list = []
+    for i in range(len(nodes)):
+        city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude})
+        print city_list
+    return json.dumps(city_list)
+
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
+
 
     filename = request.form['data']
     n = float(request.form['scaling'])
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
-    coord_file = open(filename)
+    
+    if filename == "GMdata":
+        nodes = model.session.query(model.City).all()
+        coords = tsp.read_coords_db(nodes)
+    else:
+        coord_file = open(filename)
+        coords = tsp.read_coords(coord_file)
 
-    coords = tsp.read_coords(coord_file)
+
     matrix = tsp.cartesian_matrix(coords)
 
     #We begin our hill climb
@@ -52,10 +85,10 @@ def get_parameters():
     data = json.dumps(results)
     return data
 
-@app.route("/maptutorial")
-def maptutorial():
-    """Return the map tutorial page"""  
-    return render_template("maptutorial.html")
+# @app.route("/maptutorial")
+# def maptutorial():
+#     """Return the map tutorial page"""  
+#     return render_template("maptutorial.html")
 
 
 

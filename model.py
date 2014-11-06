@@ -1,17 +1,17 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine #, DateTime
 from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.orm import sessionmaker #, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session
 # from sqlalchemy import ForeignKey
 # from sqlalchemy.orm import relationship, backref
 
-# engine = create_engine("sqlite:///tsp.db", echo = False)
-# session = scoped_session(sessionmaker(bind=engine, autocommit = False, autoflush = False))
+engine = create_engine("sqlite:///tsp.db", echo = False)
+session = scoped_session(sessionmaker(bind=engine, autocommit = False, autoflush = False))
 
 Base = declarative_base()
-# Base.query = session.query_property()
-ENGINE = None
-Session = None
+Base.query = session.query_property()
+#ENGINE = None
+#Session = None
 
 ### Class declarations go here
 class City(Base):
@@ -32,7 +32,7 @@ def connect():
 
     ENGINE = create_engine("sqlite:///tsp.db", echo = True)
     Session = sessionmaker(bind=ENGINE)
-    Base.metadata.create_all(ENGINE)
+    #Base.metadata.create_all(ENGINE)
 
     return Session()
 

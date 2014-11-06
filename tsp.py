@@ -10,6 +10,18 @@ def read_coords(coord_file):
         coords.append((float(x),float(y)))
     return coords
 
+def read_coords_db(cities):
+    '''in which data passes from Flask / SQLAlchemy to be used in the 
+    coordinates file
+    '''
+    print cities[0].city #Yay I have my data to be used here.
+    coords=[]
+    for i in range(len(cities)):
+        x, y = cities[i].lat, -cities[i].longitude
+        coords.append((float(x),float(y)))
+    return coords
+    
+
 def cartesian_matrix(coords):
     '''Ceate a distance matrix for the city coordsthat uses straight line 
     distance. Input a list of (x,y) tuples and output a dictionary of the 
