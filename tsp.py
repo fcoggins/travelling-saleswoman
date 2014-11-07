@@ -14,19 +14,18 @@ def read_coords_db(cities):
     '''in which data passes from Flask / SQLAlchemy to be used in the 
     coordinates file
     '''
-    print cities[0].city #Yay I have my data to be used here.
     coords=[]
     for i in range(len(cities)):
-        x, y = cities[i].lat, -cities[i].longitude
+        x, y = cities[i].lat, cities[i].longitude
         coords.append((float(x),float(y)))
     return coords
     
 
 def cartesian_matrix(coords):
-    '''Ceate a distance matrix for the city coordsthat uses straight line 
+    '''Create a distance matrix for the city coordsthat uses straight line 
     distance. Input a list of (x,y) tuples and output a dictionary of the 
     distance between all pairs of cities.
-    ex. matrix[1,2] will output the distance between city 1 and city 2. all
+    ex. matrix[1][2] will output the distance between city 1 and city 2. all
     distances are in the matrix twice from a to b and from b to a.
     '''
     matrix={}
@@ -36,6 +35,23 @@ def cartesian_matrix(coords):
             dist=math.sqrt(dx*dx + dy*dy)
             matrix[i,j]=dist
     return matrix
+
+def distance_matrix(coords):
+    '''Calculates distance between two points using the spherical law of cosines.
+    Input is (lat, long) for city one and (lat, long) for city two. Output a 
+    dictionary of the distance between all pairs of cities.
+    '''
+    matrix = {}
+    R = 6371
+    for i,(lat1,lon1) in enumerate(coords):
+        for j,(lat2,lon2) in enumerate(coords): 
+            a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + \
+            math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
+            (1 - math.cos((lon2 - lon1) * math.pi / 180))/2
+            dist = R * 2 * math.asin(math.sqrt(a))
+            matrix[i,j]=dist * 0.621371 #convert to miles
+    return matrix
+
 
 def print_nice_matrix(matrix):
 	'''Print a nice distance matrix that is readable by humans'''
@@ -52,7 +68,6 @@ def tour_length(matrix,tour):
     '''
     total=0
     num_cities=len(tour)
-    #print num_cities
     for i in range(num_cities):
         j=(i+1)%num_cities
         city_i=tour[i]
@@ -100,7 +115,7 @@ def reversed_sections(tour):
             if copy != tour: # no point returning the same tour
                 yield copy
 
-def write_tour_to_img(coords,tour, n, img_file):
+def write_tour_to_img(coords, tour, n, img_file):
 
     #scale coordinates by n
     coords=[(x*n,y*n) for (x,y) in coords]

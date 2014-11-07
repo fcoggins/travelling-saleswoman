@@ -40,7 +40,6 @@ def get_cities_data():
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
 
-
     filename = request.form['data']
     n = float(request.form['scaling'])
     cycles = int(request.form['cycles'])
@@ -49,12 +48,12 @@ def get_parameters():
     if filename == "GMdata":
         nodes = model.session.query(model.City).all()
         coords = tsp.read_coords_db(nodes)
+        matrix = tsp.distance_matrix(coords)
+
     else:
         coord_file = open(filename)
         coords = tsp.read_coords(coord_file)
-
-
-    matrix = tsp.cartesian_matrix(coords)
+        matrix = tsp.cartesian_matrix(coords)   
 
     #We begin our hill climb
     init_function =lambda: tsp.init_random_tour(len(coords))
@@ -84,11 +83,6 @@ def get_parameters():
     "img_file" : img_file}
     data = json.dumps(results)
     return data
-
-# @app.route("/maptutorial")
-# def maptutorial():
-#     """Return the map tutorial page"""  
-#     return render_template("maptutorial.html")
 
 
 
