@@ -30,11 +30,9 @@ def get_cities_data():
     [ ("Annapolis", 34, 5), ("Austin", 2, 4)]
     """
     nodes = model.session.query(model.City).all()
-    print len(nodes)
     city_list = []
     for i in range(len(nodes)):
         city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude})
-        print city_list
     return json.dumps(city_list)
 
 @app.route("/userinput", methods=['POST'])
@@ -53,7 +51,9 @@ def get_parameters():
     else:
         coord_file = open(filename)
         coords = tsp.read_coords(coord_file)
-        matrix = tsp.cartesian_matrix(coords)   
+        matrix = tsp.cartesian_matrix(coords)
+
+    
 
     #We begin our hill climb
     init_function =lambda: tsp.init_random_tour(len(coords))
@@ -67,24 +67,26 @@ def get_parameters():
 
     num_evaluations, best_score, best = result
 
-  
-    #generate a new image file name
+    #Cache-busting create a unique file path to prevent cacheing of the image
 
-    img_file = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
-    img_file = 'static/img/' + img_file + '.png'
+    ext = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
+    img_file = 'static/img/plot.png'
+    img_path = img_file+'/?v='+ext
 
     #write to an image file
 
     tsp.write_tour_to_img(coords, best, n, img_file)
 
+    #write to map
+    
+    tour_coords = tsp.drawtour_on_map(coords,best)
+
     #return results as JSON
 
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
-    "img_file" : img_file}
+    "img_file" : img_path, "tour_coords": tour_coords}
     data = json.dumps(results)
     return data
-
-
 
 if __name__ == "__main__":
 

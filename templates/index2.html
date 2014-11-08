@@ -4,7 +4,7 @@
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
     <style type="text/css">
       html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
-      .map { width: 800px; height: 500px; float: left; border: 1px solid black;}
+      .map { width: 1300px; height: 500px; float: left; border: 1px solid black;}
     </style>    
 </head>
 <body>
@@ -20,6 +20,7 @@
         <form id="userinput">
             <label for="data">Data set</label>
             <select id="data" name="data">
+                <option value="GMdata">Map data from Google Maps</option>
                 <option value="cities10.txt">10 US cities</option>
                 <option value="cities48.txt">48 US cities</option>
             </select>

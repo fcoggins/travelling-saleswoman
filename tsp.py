@@ -152,6 +152,19 @@ def write_tour_to_img(coords, tour, n, img_file):
     del d
     img.save(img_file, "PNG")
 
+def drawtour_on_map(coords, tour):
+    '''return a list of tuples to use in drawing on map. Each tuple represents
+    a tour segment.
+    '''
+    num_cities = len(tour)
+    list_of_tour_segments = []
+
+    for i in range(num_cities):
+        city_i=tour[i]
+        list_of_tour_segments.append(coords[city_i])
+    return list_of_tour_segments
+
+
 def init_random_tour(tour_length):
     '''Takes tour length as an arguement and returns a random tour'''
     tour=range(tour_length)
