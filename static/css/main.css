@@ -2,14 +2,24 @@
     float: right;
 }
 
-.user_input{
+.user_input, .results{
     width: 250px;
-    border: 1px solid black;
+}
+
+.user_input{
+       position: relative;
+       bottom: 550px;
+       left: 82%;
+       z-index: 500;
+       opacity: 0.7;
 }
 
 .results{
-    width: 250px;
-    border: 1px solid black;
+    position: relative;
+       bottom: 550px;
+       left: 82%;
+       z-index: 500;
+       opacity: 0.7;
 }
 
 img {

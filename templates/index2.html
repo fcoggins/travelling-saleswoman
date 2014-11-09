@@ -1,54 +1,124 @@
 <html>
 <head>
     <title>GM - TSP visualization</title>
+    <!-- Bootstrap -->
+   
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="static/dist/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="static/dist/css/bootstrap-theme.min.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
     <style type="text/css">
       html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
-      .map { width: 1300px; height: 500px; float: left; border: 1px solid black;}
+      .map { width: 100%; border: 1px solid black;}
     </style>    
 </head>
 <body>
-    <h1>Let's try it with Google Maps</h1>
-    <div id="panel" style="margin-left: 50px">
-      <button id="drop">Drop Markers</button>
-     </div>
-    <div id="map-canvas" class="map"></div>
-
-    <div class = "right">
-        <div class = "user_input">
-        <h2>Input</h2>
-        <form id="userinput">
-            <label for="data">Data set</label>
-            <select id="data" name="data">
-                <option value="GMdata">Map data from Google Maps</option>
-                <option value="cities10.txt">10 US cities</option>
-                <option value="cities48.txt">48 US cities</option>
-            </select>
-            <br>
-            <label for="scaling">Scaling factor</label>
-            <input type="text" id="scaling" name="scaling" value = "0.09">
-            <br>
-            <label for="algorithm">Algorithm</label>
-            <select id="algorithm" name="algorithm">
-                <option value="hillclimb">Basic Hillclimb</option>
-                <option value="hillclimb and restart">Hillclimb and restart</option>
-            </select>
-            <br>
-            <label for="cycles">Max. iterations</label>
-            <input type="text" id="cycles" name="cycles" value = "100">
-            <br>
-            <button type="submit" id="submitbutton">Give it a spin<submit>
-        </form>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Bootstrap theme</a>
         </div>
-
-        <div class = "results">
-        <h2>Results</h2>
-        <h3>Number of iterations = <span id = "number"></span> </h3>
-        <h3>Best Score = <span id = "score"></span></h3>
-        <h3>Best Route = <span id = "route"></span></h3>
-        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="jumbotron">
+        <div id="panel" style="margin-left: 50px">
+          <button id="drop">Drop Markers</button>
+         </div>
+        <div id="map-canvas" class="map"></div>
     </div>
+
+
+
+
+        <div class="panel panel-default user_input">
+            <div class="panel-heading">
+              <h3 class="panel-title">Input</h3>
+            </div>
+            <div class="panel-body">
+                <form id="userinput">
+                    <label for="data">Data set</label>
+                    <select id="data" name="data">
+                        <option value="GMdata">Map data from Google Maps</option>
+                        <option value="cities10.txt">10 US cities</option>
+                        <option value="cities48.txt">48 US cities</option>
+                    </select>
+                    <br>
+                    <label for="scaling">Scaling factor</label>
+                    <input type="text" id="scaling" name="scaling" value = "0.09">
+                    <br>
+                    <label for="algorithm">Algorithm</label>
+                    <select id="algorithm" name="algorithm">
+                        <option value="hillclimb">Basic Hillclimb</option>
+                        <option value="hillclimb and restart">Hillclimb and restart</option>
+                    </select>
+                    <br>
+                    <label for="cycles">Max. iterations</label>
+                    <input type="text" id="cycles" name="cycles" value = "100">
+                    <br>
+                    <button type="submit" id="submitbutton">Give it a spin<submit>
+                </form>
+            </div>
+        </div>
+
+
+
+        <div class="panel panel-default results">
+            <div class="panel-heading">
+              <h3 class="panel-title">Results</h3>
+            </div>
+            <div class="panel-body">
+                <ul>
+                    <li>Number of iterations = <span id = "number"></span></li>
+                    <li>Best Score = <span id = "score"></span></li>
+                    <li>Best Route = <span id = "route"></span></li>
+                </ul>
+            </div>
+        </div>
+
+
+    <div class="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </div>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="dist/js/bootstrap.min.js"></script>
 <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZIoOX8afLsDVhpqC788YraO1ApQLwwcg">
 </script>

@@ -9,20 +9,17 @@ app.jinja_env.undefined = jinja2.StrictUndefined
 @app.route("/")
 def index():
     """Return the index page"""  
-    return render_template("index.html")
+    return render_template("index2.html")
 
 @app.route("/index2")
 def index2():
     """Now let's add the map to the page"""
-    #pulling stuff from database, the two statements below actually need to
-    #happen later when processing the form input
-
-    #nodes = model.session.query(model.City).all()
-    #tsp.read_coords_db(nodes)
-
     return render_template("index2.html")
 
-
+@app.route("/index3")
+def index3():
+    """Bootstrap"""
+    return render_template("index3.html")
 
 @app.route("/get_cities_data", methods=['GET'])
 def get_cities_data():
@@ -78,7 +75,7 @@ def get_parameters():
     tsp.write_tour_to_img(coords, best, n, img_file)
 
     #write to map
-    
+
     tour_coords = tsp.drawtour_on_map(coords,best)
 
     #return results as JSON
