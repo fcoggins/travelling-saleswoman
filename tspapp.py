@@ -16,10 +16,12 @@ def index2():
     """Now let's add the map to the page"""
     return render_template("index2.html")
 
-@app.route("/index3")
-def index3():
-    """Bootstrap"""
-    return render_template("index3.html")
+# @app.route("/index3")
+# def test_distance():
+#     """test the distance look up"""
+#     distance = tsp.look_up_distance(1,22)
+#     print distance
+#     return render_template("index3.html")
 
 @app.route("/get_cities_data", methods=['GET'])
 def get_cities_data():
@@ -39,11 +41,16 @@ def get_parameters():
     n = float(request.form['scaling'])
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
+
     
     if filename == "GMdata":
         nodes = model.session.query(model.City).all()
         coords = tsp.read_coords_db(nodes)
+        #To calculate the distance matrix on the fly. This is faster for 48 capital
+        #cities.
         matrix = tsp.distance_matrix(coords)
+        #To pull the distance matrix from the database
+        #matrix = tsp.distance_matrix_from_db()
 
     else:
         coord_file = open(filename)
@@ -56,13 +63,17 @@ def get_parameters():
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
     if algorithm == "hillclimb":
+        print "hello"
         result = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-    if algorithm == "hill_restart":
+    elif algorithm == "hill_restart":
         result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-    else:
+    elif algorithm == "nearest":
         result = tsp.greedy(matrix)
+    else:
+        print "error"
+        return "error"
 
     num_evaluations, best_score, best = result
 

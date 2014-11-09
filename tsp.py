@@ -1,4 +1,4 @@
-import math, random, logging
+import math, random, logging, model
 from PIL import Image, ImageFont, ImageDraw
 
 def read_coords(coord_file):
@@ -37,7 +37,8 @@ def cartesian_matrix(coords):
     return matrix
 
 def distance_matrix(coords):
-    ''' Output a dictionary of the distance between all pairs of cities.
+    ''' Output a dictionary of the distance between all pairs of cities. As above
+    but we have the option of using our own functions to calculate the distance
     '''
     matrix = {}
 
@@ -49,7 +50,7 @@ def distance_matrix(coords):
 def distance_between_two_cities(lat1, lon1, lat2, lon2):
     '''Calculates distance between two points using the spherical law of cosines.
     Input is (lat, long) for city one and (lat, long) for city two.'''
-    
+
     R = 6371
     a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + \
         math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
@@ -57,15 +58,53 @@ def distance_between_two_cities(lat1, lon1, lat2, lon2):
     dist = R * 2 * math.asin(math.sqrt(a)) * 0.621371 #convert to miles
     return dist
 
+def distance_matrix_from_db():
+    '''This will pull data from our database table of 48 us cities into a matrix 
+    to be used for tour length calculations. It will look like {(city1_id, city2_id):
+    distance, (cityn_id, citym_id): distance, ...}. This is done to avoid recalculating
+    distances each time an algorithm is called'''
 
+    matrix = {}
+    distances = model.session.query(model.Distance).all()
+    length = int(math.sqrt(len(distances)))
+    #since this is a symetric problem we only have to calculate the matrix from i to j
+    #and not from j to i. However, tour length only looks for the tuple which is the key
+    #in on direction so we may have to build the second half of the matrix.
+    for i in range(length):
+        for j in range(i+1, length):
+            city1 = i + 1
+            city2 = j + 1
+            miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
+                filter(model.Distance.city2_id == city2).first()
+            #print i, j, miles.miles
+            matrix[(i, j)] = miles.miles
+            matrix[(j, i)] = matrix[(i, j)]
+    #print_nice_matrix(matrix)
+    return matrix
 
 def print_nice_matrix(matrix):
-	'''Print a nice distance matrix that is readable by humans'''
-	length = int(math.sqrt(len(matrix)))
-	print length
-	for i in range(length):
-		for j in range (i+1, length):
-			print "Distance from %d to %d is %0.0f"%(i, j, matrix[i,j])
+    '''Print a nice distance matrix that is readable by humans. Used for debugging'''
+
+    print len(matrix)
+    print math.sqrt(len(matrix))
+    length = int(math.sqrt(len(matrix)))
+    print length
+    for i in range(length):
+    	for j in range (i+1, length):
+    		print "Distance from %d to %d is %0.0f"%(i, j, matrix[i,j])
+
+def look_up_distance(city1, city2):
+    '''Look up the distance between any two cities from the database. This does 
+    the look up one at a time and slows the program way down as opposed to having 
+    the matrix in memory.'''
+
+    #For our model, city id's are the indexed id's + 1
+    city1 += 1
+    city2 += 1
+    #Look it up and return
+    distances = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
+        filter(model.Distance.city2_id == city2).one()
+    return distances.miles
 
 def tour_length(matrix,tour):
     '''Calculate the length of any particular tour.
@@ -80,6 +119,7 @@ def tour_length(matrix,tour):
         city_j=tour[j]
         total+=matrix[city_i,city_j]
     return total
+
 
 def all_pairs(size,shuffle=random.shuffle):
     r1=range(size)
