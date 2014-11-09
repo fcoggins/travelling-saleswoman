@@ -14,6 +14,31 @@ $("#drop").on("click", get_cities_data);
 function initialize(){
     // Create an array of styles.
     var styles = [
+  //   {
+  //   "featureType": "administrative.province",
+  //   "elementType": "geometry.stroke",
+  //   "stylers": [
+  //     { "color": "#bdd4de" }
+  //   ]
+  // },{
+  //   "featureType": "landscape.natural",
+  //   "stylers": [
+  //     { "color": "#2b3a42" }
+  //   ]
+  // },{
+  //   "featureType": "water",
+  //   "stylers": [
+  //     { "visibility": "on" },
+  //     { "color": "#3f5765" }
+  //   ]
+  // },{
+  //   "featureType": "landscape.natural.terrain",
+  //   "elementType": "geometry.stroke",
+  //   "stylers": [
+  //     { "visibility": "on" },
+  //     { "color": "#808080" }
+  //   ]
+  // },
        {
          featureType: "administrative",
          elementType: "labels",
@@ -38,7 +63,18 @@ function initialize(){
          stylers: [
            { visibility: "off" }
          ]
-       }
+       },{
+        featureType: "road",
+        stylers: [
+            { visibility: "off" }
+    ]
+  }
+  // ,{
+  //   "featureType": "landscape.natural.terrain",
+  //   "stylers": [
+  //     { "visibility": "off" }
+  //   ]
+  // }
      ];
 
     // Create a new StyledMapType object, passing it the array of styles,
@@ -58,7 +94,7 @@ function initialize(){
                 scrollwheel: false,
                 disableDoubleClickZoom: true,
                 mapTypeControlOptions: {
-                    mapTypeIds: [google.maps.MapTypeId.TERRAIN, 'map_style']
+                    mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
                 }
             };
 

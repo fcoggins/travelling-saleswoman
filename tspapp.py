@@ -52,15 +52,17 @@ def get_parameters():
 
     
 
-    #We begin our hill climb
+    #Choose our algorithm
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
     if algorithm == "hillclimb":
         result = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-    else:
+    if algorithm == "hill_restart":
         result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
+    else:
+        result = tsp.greedy(matrix)
 
     num_evaluations, best_score, best = result
 

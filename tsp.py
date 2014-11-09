@@ -238,3 +238,32 @@ def hillclimb_and_restart(
     return (num_evaluations,best_score,best)
 
 
+#Working on nearest neighbor here but first I need to put the distance matrix into the database
+#so that I can look up the distances here
+def greedy(dist):
+    '''solve using the greedy algorithm.'''
+    n = int(math.sqrt(len(dist)))
+    #print n
+
+    current_city = 0
+    unvisited_cities = set(range(1, n))
+    print unvisited_cities
+    solution = [current_city]
+    #print dist
+
+    def distance_from_current_city(to):
+        #print to
+        #print dist[current_city, to]
+        return dist[current_city, to]
+
+    while unvisited_cities:
+
+        next_city = min(unvisited_cities, key=distance_from_current_city)
+        unvisited_cities.remove(next_city)
+        solution.append(next_city)
+        current_city = next_city
+    length = tour_length(dist, solution)
+    print solution, length
+    return (None, length, solution)
+
+
