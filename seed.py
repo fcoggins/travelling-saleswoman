@@ -1,4 +1,4 @@
-import model
+import model, tsp
 import csv
 
 def load_cities(session):
@@ -11,13 +11,17 @@ def load_cities(session):
     session.commit()
 
 def load_distance(session):
-    """loop through all the cities in the cities table and make call to Google Maps
-    Distance Matrix API. Then enter the data into the database.
+    """loop through all the cities in the cities table and calculate the distance
+    between them and insert into the matrix.
     """
     nodes = model.session.query(model.City).all()
-    for i in len(nodes):
-        for j in len(nodes):
-            print nodes[i].city, nodes[j].city
+    for i in range(len(nodes)):
+        for j in range(len(nodes)):
+            dist = tsp.distance_between_two_cities(nodes[i].lat, nodes[i].longitude,
+             nodes[j].lat, nodes[j].longitude)
+            distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, miles = dist)
+            session.add(distance)
+    session.commit()
 
 def main(session):
 

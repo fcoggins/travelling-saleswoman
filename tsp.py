@@ -37,20 +37,26 @@ def cartesian_matrix(coords):
     return matrix
 
 def distance_matrix(coords):
-    '''Calculates distance between two points using the spherical law of cosines.
-    Input is (lat, long) for city one and (lat, long) for city two. Output a 
-    dictionary of the distance between all pairs of cities.
+    ''' Output a dictionary of the distance between all pairs of cities.
     '''
     matrix = {}
-    R = 6371
+
     for i,(lat1,lon1) in enumerate(coords):
         for j,(lat2,lon2) in enumerate(coords): 
-            a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + \
-            math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
-            (1 - math.cos((lon2 - lon1) * math.pi / 180))/2
-            dist = R * 2 * math.asin(math.sqrt(a))
-            matrix[i,j]=dist * 0.621371 #convert to miles
+            matrix[i,j]=distance_between_two_cities(lat1, lon1, lat2, lon2)
     return matrix
+
+def distance_between_two_cities(lat1, lon1, lat2, lon2):
+    '''Calculates distance between two points using the spherical law of cosines.
+    Input is (lat, long) for city one and (lat, long) for city two.'''
+    
+    R = 6371
+    a = 0.5 - math.cos((lat2 - lat1) * math.pi / 180)/2 + \
+        math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * \
+        (1 - math.cos((lon2 - lon1) * math.pi / 180))/2
+    dist = R * 2 * math.asin(math.sqrt(a)) * 0.621371 #convert to miles
+    return dist
+
 
 
 def print_nice_matrix(matrix):
