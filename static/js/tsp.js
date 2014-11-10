@@ -94,7 +94,7 @@ function initialize(){
                 scrollwheel: false,
                 disableDoubleClickZoom: true,
                 mapTypeControlOptions: {
-                    mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
                 }
             };
 

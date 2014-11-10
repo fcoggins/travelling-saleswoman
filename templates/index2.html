@@ -32,11 +32,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Bootstrap theme</a>
+          <a class="navbar-brand" href="#">The Travelling Salesman</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li class="active"><a href="#">48 US State Capitals</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
             <li class="dropdown">
@@ -71,27 +71,27 @@
             </div>
             <div class="panel-body">
                 <form id="userinput">
-                    <label for="data">Data set</label>
+<!--                    <label for="data">Data set</label>
                     <select id="data" name="data">
                         <option value="GMdata">Map data from Google Maps</option>
                         <option value="cities10.txt">10 US cities</option>
                         <option value="cities48.txt">48 US cities</option>
                     </select>
                     <br>
-                    <label for="scaling">Scaling factor</label>
+                     <label for="scaling">Scaling factor</label>
                     <input type="text" id="scaling" name="scaling" value = "0.09">
                     <br>
-                    <label for="algorithm">Algorithm</label>
+ -->                    <label for="algorithm">Algorithm:</label>
                     <select id="algorithm" name="algorithm">
                         <option value="hillclimb">Basic Hillclimb</option>
-                        <option value="hill_restart">Hillclimb and restart</option>
-                        <option value="nearest">Nearest neighbor</option>
+                        <option value="hill_restart">Hillclimb & Restart</option>
+                        <option value="nearest">Nearest Neighbor</option>
                     </select>
                     <br>
-                    <label for="cycles">Max. iterations</label>
-                    <input type="text" id="cycles" name="cycles" value = "100">
+                    <label for="cycles">Maximum trys:</label>
+                    <input type="text" id="cycles" name="cycles" value = "100" size="10">
                     <br>
-                    <button type="submit" id="submitbutton">Give it a spin<submit>
+                    <button type="submit" id="submitbutton">Solve<submit>
                 </form>
             </div>
         </div>

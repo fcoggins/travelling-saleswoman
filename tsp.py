@@ -284,22 +284,16 @@ def hillclimb_and_restart(
     return (num_evaluations,best_score,best)
 
 
-#Working on nearest neighbor here but first I need to put the distance matrix into the database
-#so that I can look up the distances here
+#Nearest Neighbor algorithm
 def greedy(dist):
     '''solve using the greedy algorithm.'''
     n = int(math.sqrt(len(dist)))
-    #print n
 
     current_city = 0
     unvisited_cities = set(range(1, n))
-    print unvisited_cities
     solution = [current_city]
-    #print dist
 
     def distance_from_current_city(to):
-        #print to
-        #print dist[current_city, to]
         return dist[current_city, to]
 
     while unvisited_cities:
@@ -309,7 +303,97 @@ def greedy(dist):
         solution.append(next_city)
         current_city = next_city
     length = tour_length(dist, solution)
-    print solution, length
     return (None, length, solution)
+
+
+#Simulated Annealing
+
+def P(prev_score,next_score,temperature):
+    '''The probability function for deciding whether to move from previous 
+    score to next score. If the next score is better we always accept it. This
+    function will select solutions closer to the current solution with a high 
+    probability. Temperature is used to vary the probability. At higher temperatures,
+    probability will be higher. At lower temperature, as the function cools,
+    probabilities are lower.
+    '''
+
+    if next_score > prev_score:
+        return 1.0
+    else:
+        return math.exp( -abs(next_score-prev_score)/temperature )
+
+
+def kirkpatrick_cooling(start_temp,alpha):
+    '''This is a generator function that determines how the temperature will drop
+    off. The temperature drops off quickly then decreases slowly. Alpha is less
+    than 1.'''
+
+    T=start_temp
+    while True:
+        yield T
+        T=alpha*T
+
+class ObjectiveFunction:
+    '''class to wrap an objective function and 
+    keep track of the best solution evaluated'''
+    def __init__(self,objective_function):
+        self.objective_function=objective_function
+        self.best=None
+        self.best_score=None
+    
+    def __call__(self,solution):
+        score=self.objective_function(solution)
+        if self.best is None or score > self.best_score:
+            self.best_score=score
+            self.best=solution
+        return score
+
+def anneal(init_function,move_operator,objective_function,max_evaluations,
+    start_temp,alpha):
+    '''Initialization function (we could use random but why not try nearest neighbor).
+    The move operator could be reversed_sections or swapped_cities. alpha should be
+    less than 1. Start temperature and alpha can be varied and the optimum can be reached
+    through experimentation.
+    '''
+    
+    # wrap the objective function (so we record the best)
+    objective_function=ObjectiveFunction(objective_function)
+    
+    current=init_function()
+    current_score=objective_function(current)
+    num_evaluations=1
+    
+    cooling_schedule=kirkpatrick_cooling(start_temp,alpha)
+
+    logging.info('anneal started: score=%f',current_score)
+    
+    for temperature in cooling_schedule:
+        done = False
+        # examine moves around our current position
+        for next in move_operator(current):
+            if num_evaluations >= max_evaluations:
+                done=True
+                break
+            
+            next_score=objective_function(next)
+            num_evaluations+=1
+            
+            # probablistically accept this solution
+            # always accepting better solutions
+            p=P(current_score,next_score,temperature)
+            if random.random() < p:
+                current=next
+                current_score=next_score
+                break
+        # see if completely finished
+        if done: break
+    
+    best_score=objective_function.best_score
+    best=objective_function.best
+    logging.info('final temperature: %f',temperature)
+    logging.info('anneal finished: num_evaluations=%d, best_score=%f',num_evaluations,best_score)
+    return (num_evaluations,best_score,best)
+
+
 
 

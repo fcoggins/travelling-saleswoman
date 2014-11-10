@@ -1,5 +1,5 @@
 from flask import Flask, request, session as fsksession, render_template, g, redirect, url_for, flash
-import os, jinja2, random, string, json
+import os, jinja2, random, string, json, sys
 import tsp, model
 
 app = Flask(__name__)
@@ -10,18 +10,6 @@ app.jinja_env.undefined = jinja2.StrictUndefined
 def index():
     """Return the index page"""  
     return render_template("index2.html")
-
-@app.route("/index2")
-def index2():
-    """Now let's add the map to the page"""
-    return render_template("index2.html")
-
-# @app.route("/index3")
-# def test_distance():
-#     """test the distance look up"""
-#     distance = tsp.look_up_distance(1,22)
-#     print distance
-#     return render_template("index3.html")
 
 @app.route("/get_cities_data", methods=['GET'])
 def get_cities_data():
@@ -36,34 +24,20 @@ def get_cities_data():
 
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
-
-    filename = request.form['data']
-    n = float(request.form['scaling'])
+    
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
 
-    
-    if filename == "GMdata":
-        nodes = model.session.query(model.City).all()
-        coords = tsp.read_coords_db(nodes)
-        #To calculate the distance matrix on the fly. This is faster for 48 capital
-        #cities.
-        matrix = tsp.distance_matrix(coords)
-        #To pull the distance matrix from the database
-        #matrix = tsp.distance_matrix_from_db()
-
-    else:
-        coord_file = open(filename)
-        coords = tsp.read_coords(coord_file)
-        matrix = tsp.cartesian_matrix(coords)
-
-    
+    nodes = model.session.query(model.City).all()
+    coords = tsp.read_coords_db(nodes)
+    #To calculate the distance matrix on the fly. This is faster for 48 capital
+    #cities.
+    matrix = tsp.distance_matrix(coords) 
 
     #Choose our algorithm
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
     if algorithm == "hillclimb":
-        print "hello"
         result = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
     elif algorithm == "hill_restart":
@@ -71,21 +45,14 @@ def get_parameters():
             objective_function, cycles)
     elif algorithm == "nearest":
         result = tsp.greedy(matrix)
+    elif algorithm == "annealing":
+        result = tsp.anneal(init_function, tsp.reversed_sections, objective_function,
+            cycles,start_temp,alpha)
     else:
         print "error"
         return "error"
 
     num_evaluations, best_score, best = result
-
-    #Cache-busting create a unique file path to prevent cacheing of the image
-
-    ext = ''.join(random.choice(string.ascii_lowercase) for i in range(7))
-    img_file = 'static/img/plot.png'
-    img_path = img_file+'/?v='+ext
-
-    #write to an image file
-
-    tsp.write_tour_to_img(coords, best, n, img_file)
 
     #write to map
 
@@ -94,9 +61,16 @@ def get_parameters():
     #return results as JSON
 
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
-    "img_file" : img_path, "tour_coords": tour_coords}
+     "tour_coords": tour_coords}
     data = json.dumps(results)
     return data
+
+def run_anneal(init_function,move_operator,objective_function,max_iterations,start_temp,alpha):
+    if start_temp is None or alpha is None:
+        print "missing --cooling start_temp:alpha for annealing"
+        sys.exit(1)
+    iterations,score,best=tsp.anneal(init_function,move_operator,objective_function,max_iterations,start_temp,alpha)
+    return iterations,score,best
 
 if __name__ == "__main__":
 
