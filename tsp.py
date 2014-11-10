@@ -365,7 +365,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     
     cooling_schedule=kirkpatrick_cooling(start_temp,alpha)
 
-    logging.info('anneal started: score=%f',current_score)
+    print 'anneal started: score=%f'%current_score
     
     for temperature in cooling_schedule:
         done = False
@@ -390,8 +390,9 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     
     best_score=objective_function.best_score
     best=objective_function.best
-    logging.info('final temperature: %f',temperature)
-    logging.info('anneal finished: num_evaluations=%d, best_score=%f',num_evaluations,best_score)
+    #print 'final temperature: %f'%temperature
+    #print num_evaluations, best_score
+    #print 'anneal finished: num_evaluations=%d, best_score=%f'%num_evaluations,best_score
     return (num_evaluations,best_score,best)
 
 

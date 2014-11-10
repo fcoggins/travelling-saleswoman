@@ -27,6 +27,8 @@ def get_parameters():
     
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
+    start_temp = float(request.form['start_temp'])
+    alpha = float(request.form['alpha'])
 
     nodes = model.session.query(model.City).all()
     coords = tsp.read_coords_db(nodes)
@@ -65,12 +67,6 @@ def get_parameters():
     data = json.dumps(results)
     return data
 
-def run_anneal(init_function,move_operator,objective_function,max_iterations,start_temp,alpha):
-    if start_temp is None or alpha is None:
-        print "missing --cooling start_temp:alpha for annealing"
-        sys.exit(1)
-    iterations,score,best=tsp.anneal(init_function,move_operator,objective_function,max_iterations,start_temp,alpha)
-    return iterations,score,best
 
 if __name__ == "__main__":
 

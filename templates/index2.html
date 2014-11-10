@@ -86,10 +86,17 @@
                         <option value="hillclimb">Basic Hillclimb</option>
                         <option value="hill_restart">Hillclimb & Restart</option>
                         <option value="nearest">Nearest Neighbor</option>
+                        <option value="annealing">Simulated Annealing</option>
                     </select>
                     <br>
                     <label for="cycles">Maximum trys:</label>
                     <input type="text" id="cycles" name="cycles" value = "100" size="10">
+                    <br>
+                    <label for="start_temp">Start Temp:</label>
+                    <input type="text" id="start_temp" name="start_temp" value = "10" size="10">
+                    <br>
+                    <label for="alpha">alpha (&lt;1):</label>
+                    <input type="text" id="alpha" name="alpha" value = ".5" size="10">
                     <br>
                     <button type="submit" id="submitbutton">Solve<submit>
                 </form>
