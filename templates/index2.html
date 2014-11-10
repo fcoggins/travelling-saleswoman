@@ -81,12 +81,17 @@
                      <label for="scaling">Scaling factor</label>
                     <input type="text" id="scaling" name="scaling" value = "0.09">
                     <br>
- -->                    <label for="algorithm">Algorithm:</label>
+ -->                <label for="algorithm">Algorithm:</label>
                     <select id="algorithm" name="algorithm">
                         <option value="hillclimb">Basic Hillclimb</option>
                         <option value="hill_restart">Hillclimb & Restart</option>
                         <option value="nearest">Nearest Neighbor</option>
                         <option value="annealing">Simulated Annealing</option>
+                    </select>
+                    <label for="move_operator">Move Operator:</label>
+                    <select id="move_operator" name="move_operator">
+                        <option value="swapped_cities">Swap Cities</option>
+                        <option value="reversed_sections">Swap Edges</option>
                     </select>
                     <br>
                     <label for="cycles">Maximum trys:</label>

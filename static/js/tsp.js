@@ -147,10 +147,12 @@ function addMarker() {
             position: cities[iterator],
             map: map,
             draggable: false,
+            icon: "http://labs.google.com/ridefinder/images/mm_20_gray.png",
             animation: google.maps.Animation.DROP
           }));
           iterator++;
         }
+
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
@@ -175,7 +177,7 @@ function handleFormSubmit(evt) {
             $("#plot").attr("src", data.img_file);
             $('#number').text(data.iterations);
             $('#score').text(data.best_score);
-            $('#route').text(data.route);
+            $('#route').text(data.tour_cities);
             drawLine(tour_coords);
       }
 });
@@ -188,10 +190,8 @@ function get_cities_data(evt){
           dataType: 'json',
           success: function(data) {
             for (i=0; i< data.length; i++){
-                console.log(data[i].lat, -data[i].longitude);
                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
             }
-            alert(cities[0]);
             drop();
           }
         });
