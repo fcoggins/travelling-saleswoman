@@ -10,6 +10,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 get_cities_list();
 $("#userinput").on("submit", handleFormSubmit);
 $("#drop").on("click", get_cities_data);
+$("#clear").on("click", clear);
 
 
 function initialize(){
@@ -140,6 +141,50 @@ function drawLine(tour_coords){
     linePath.setMap(map);
 }
 
+function drawNearestNeighbor(tour_coords){
+    var tourLength = tour_coords.length;
+    var lineCoordinates = [];
+    var i=0;
+    var drawFunction;
+    drawFunction = setInterval(function () {
+        linePath = [];
+        j = i + 1;
+        lat1 = tour_coords[i][0];
+        long1 = -tour_coords[i][1];
+        lat2 = tour_coords[j][0];
+        long2 = -tour_coords[j][1];
+        lineCoordinates = [new google.maps.LatLng(lat1, long1),
+            new google.maps.LatLng(lat2, long2)];
+        linePath = new google.maps.Polyline({
+            path: lineCoordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        linePath.setMap(map);
+        i+=1;
+        if (i>tourLength-2){
+            clearInterval(drawFunction);
+           //close the loop
+            lat1 = tour_coords[tourLength - 1][0];
+            long1 = -tour_coords[tourLength - 1][1];
+            lat2 = tour_coords[0][0];
+            long2 = -tour_coords[0][1];
+            lineCoordinates = [new google.maps.LatLng(lat1, long1),
+                new google.maps.LatLng(lat2, long2)];
+            linePath = new google.maps.Polyline({
+                path: lineCoordinates,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+            linePath.setMap(map);
+        }
+    }, 100);
+}
+
 function addMarker() {
           markers.push(new google.maps.Marker({
             position: cities[iterator],
@@ -151,6 +196,10 @@ function addMarker() {
           iterator++;
         }
 
+function clear(evt) {
+    evt.preventDefault();
+    linePath.setMap(null);
+}
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
@@ -172,11 +221,17 @@ function handleFormSubmit(evt) {
             linePath.setMap(null);
             var image = data.img_file;
             var tour_coords = data.tour_coords;
-            $("#plot").attr("src", data.img_file);
+            $('#plot').attr("src", data.img_file);
             $('#number').text(data.iterations);
             $('#score').text(data.best_score);
             $('#route').text(data.tour_cities);
-            drawLine(tour_coords);
+            if($('#algorithm').val() == 'nearest'){
+                drawNearestNeighbor(tour_coords);
+            }
+            else
+            {
+                drawLine(tour_coords);
+            }
       }
 });
 }
