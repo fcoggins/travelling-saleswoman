@@ -7,6 +7,7 @@ var map;
 var linePath;
 
 google.maps.event.addDomListener(window, 'load', initialize);
+get_cities_list();
 $("#userinput").on("submit", handleFormSubmit);
 $("#drop").on("click", get_cities_data);
 
@@ -118,12 +119,10 @@ function initialize(){
 
 function drawLine(tour_coords){
 
-    console.log(tour_coords);
     var lineCoordinates = [];
     for (var i=0; i<tour_coords.length; i++){
         lat1 = tour_coords[i][0];
         long1 = -tour_coords[i][1];
-        console.log(lat1, long1);
         lineCoordinates.push(
             new google.maps.LatLng(lat1, long1)
         );
@@ -138,7 +137,6 @@ function drawLine(tour_coords){
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
-    console.log(linePath);
     linePath.setMap(map);
 }
 
@@ -197,4 +195,23 @@ function get_cities_data(evt){
         });
 }
 
+//populate the cities drop down list in the form
+function get_cities_list(){
+    $.ajax({
+          type: 'GET',
+          url: "/get_cities_data",
+          dataType: 'json',
+          success: function(data) {
+            text = "";
+            for (i=0; i< data.length; i++){
+                text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
+            }
+            $('#start').html(text);
+        }
+    });
+}
 });
+
+
+
+

@@ -30,6 +30,7 @@ def get_parameters():
     start_temp = float(request.form['start_temp'])
     alpha = float(request.form['alpha'])
     move_operator = request.form['move_operator']
+    start_city = int(request.form['start'])
 
     nodes = model.session.query(model.City).all()
     coords = tsp.read_coords_db(nodes)
@@ -47,7 +48,7 @@ def get_parameters():
         result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
     elif algorithm == "nearest":
-        result = tsp.greedy(matrix)
+        result = tsp.greedy(matrix, start_city)
     elif algorithm == "annealing":
         if move_operator == 'swapped_cities':
             result = tsp.anneal(init_function, tsp.swapped_cities, objective_function,
@@ -66,9 +67,7 @@ def get_parameters():
     tour_coords = tsp.drawtour_on_map(coords,best)
 
     #return results as JSON
-    print tour_coords
     tour_cities = convert_tour_to_city(best)
-    print tour_cities
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
      "tour_coords": tour_coords, "tour_cities": tour_cities}
     data = json.dumps(results)
