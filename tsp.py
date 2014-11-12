@@ -341,8 +341,10 @@ class ObjectiveFunction:
         self.objective_function=objective_function
         self.best=None
         self.best_score=None
+        self.steps=[]
     
     def __call__(self,solution):
+        self.steps.append(solution)
         score=self.objective_function(solution)
         if self.best is None or score > self.best_score:
             self.best_score=score
@@ -394,7 +396,8 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     #print 'final temperature: %f'%temperature
     #print num_evaluations, best_score
     #print 'anneal finished: num_evaluations=%d, best_score=%f'%num_evaluations,best_score
-    return (num_evaluations,best_score,best)
+    print objective_function.steps
+    return (num_evaluations,best_score,best, objective_function.steps)
 
 
 

@@ -43,13 +43,13 @@ def get_parameters():
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
     animation_steps = []
     if algorithm == "hillclimb":
-        result_hill = tsp.hillclimb(init_function, tsp.reversed_sections, 
+        result = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps = result_hill
+        num_evaluations, best_score, best, animation_steps = result
     elif algorithm == "hill_restart":
-        result_hill = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
+        result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps = result_hill
+        num_evaluations, best_score, best, animation_steps = result
     elif algorithm == "nearest":
         result = tsp.greedy(matrix, start_city)      
         num_evaluations, best_score, best = result
@@ -57,18 +57,20 @@ def get_parameters():
         if move_operator == 'swapped_cities':
             result = tsp.anneal(init_function, tsp.swapped_cities, objective_function,
             cycles,start_temp,alpha)
-            num_evaluations, best_score, best = result
+            num_evaluations, best_score, best, animation_steps = result
         else:
             result = tsp.anneal(init_function, tsp.reversed_sections, objective_function,
             cycles,start_temp,alpha)
-            num_evaluations, best_score, best = result
+            num_evaluations, best_score, best, animation_steps = result
     else:
         print "error"
         return "error"
     
     #write to map
-
+    #coordinates for a single tour
     tour_coords = tsp.drawtour_on_map(coords,best)
+
+    #coordinates for each step
     animation_coords = []
     for i in range(len(animation_steps)):
         animation_coords.append(tsp.drawtour_on_map(coords, animation_steps[i]))
