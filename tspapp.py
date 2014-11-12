@@ -68,12 +68,15 @@ def get_parameters():
     
     #write to map
 
-    tour_coords = tsp.drawtour_on_map(coords,best) #not using this at the moment so may remove
+    tour_coords = tsp.drawtour_on_map(coords,best)
+    animation_coords = []
+    for i in range(len(animation_steps)):
+        animation_coords.append(tsp.drawtour_on_map(coords, animation_steps[i]))
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
-     "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_steps": animation_steps}
+     "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_coords": animation_coords}
     data = json.dumps(results)
     return data
 

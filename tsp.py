@@ -129,7 +129,6 @@ def all_pairs(size,shuffle=random.shuffle):
         shuffle(r2)
     for i in r1:
         for j in r2:
-            #here yield returns a function
             yield (i,j)
 
 def swapped_cities(tour):

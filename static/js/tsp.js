@@ -118,12 +118,15 @@ function initialize(){
 function drawLine(tour_coords){
 
     var lineCoordinates = [];
+    linePath.setMap(null);
+    console.log(tour_coords, 'tour_coords from drawline');
     for (var i=0; i<tour_coords.length; i++){
         lat1 = tour_coords[i][0];
         long1 = -tour_coords[i][1];
         lineCoordinates.push(
             new google.maps.LatLng(lat1, long1)
         );
+        console.log(lineCoordinates, "linecoordinates");
     }
     lineCoordinates.push(
             new google.maps.LatLng(tour_coords[0][0], -tour_coords[0][1])
@@ -135,6 +138,7 @@ function drawLine(tour_coords){
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
+    console.log(linePath, "linePath");
     linePath.setMap(map);
 }
 
@@ -185,16 +189,22 @@ function drawNearestNeighbor(tour_coords){
     }, 100);
 }
 
-function drawAnimation(animation_steps){
+function drawAnimation(animation_coords){
     //Here we animate
     var i=0;
-    var drawFunction;
-    drawFunction = setInterval(function () {
-        console.log(animation_steps[i]); //The animation steps are there!
-        drawLine(animation_steps[i]); // can I call this function here???
+    //drawLine(animation_coords[i]); //need to pass the coords.. not just the steps
+    var drawAnimationFunction;
+    console.log(animation_coords.length, "animation_coords", i);
+    drawAnimationFunction = setInterval(function () {
+
+
+
+        drawLine(animation_coords[i]);
         i+=1;
-    if (i>4){
-        clearInterval(drawFunction);
+
+    if (i>(animation_coords.length - 1)){
+        clearInterval(drawAnimationFunction);
+
     }
     }, 100);
 }
@@ -241,8 +251,9 @@ function handleFormSubmit(evt) {
                 }
             var image = data.img_file;
             var tour_coords = data.tour_coords;
-            var animation_steps = data.animation_steps;
-            console.log(animation_steps);
+            var animation_coords = data.animation_coords;
+            console.log(animation_coords);
+            console.log(tour_coords);
             $('#plot').attr("src", data.img_file);
             $('#number').text(data.iterations);
             $('#score').text(data.best_score);
@@ -252,8 +263,8 @@ function handleFormSubmit(evt) {
             }
             else
             {
-                drawLine(tour_coords);
-                //drawAnimation(animation_steps);
+                //drawLine(tour_coords);
+                drawAnimation(animation_coords);
             }
       }
 });
