@@ -5,6 +5,7 @@ var markers = [];
 var iterator = 0;
 var map;
 var linePath;
+var linePaths = [];
 
 google.maps.event.addDomListener(window, 'load', initialize);
 get_cities_list();
@@ -114,10 +115,6 @@ function initialize(){
     }
 
 
-// So this isn't working. It probably would be better to build a
-//long list of the coordinates and then just accumulate a long list into
-//line coordinates. Create linepath one time. Then setMap.
-
 function drawLine(tour_coords){
 
     var lineCoordinates = [];
@@ -131,7 +128,7 @@ function drawLine(tour_coords){
     lineCoordinates.push(
             new google.maps.LatLng(tour_coords[0][0], -tour_coords[0][1])
         );
-            linePath = new google.maps.Polyline({
+    linePath = new google.maps.Polyline({
             path: lineCoordinates,
             geodesic: true,
             strokeColor: '#FF0000',
@@ -141,13 +138,14 @@ function drawLine(tour_coords){
     linePath.setMap(map);
 }
 
+
 function drawNearestNeighbor(tour_coords){
     var tourLength = tour_coords.length;
     var lineCoordinates = [];
     var i=0;
+    linePaths = [];
     var drawFunction;
     drawFunction = setInterval(function () {
-        linePath = [];
         j = i + 1;
         lat1 = tour_coords[i][0];
         long1 = -tour_coords[i][1];
@@ -163,6 +161,7 @@ function drawNearestNeighbor(tour_coords){
             strokeWeight: 2
         });
         linePath.setMap(map);
+        linePaths.push(linePath);
         i+=1;
         if (i>tourLength-2){
             clearInterval(drawFunction);
@@ -181,6 +180,7 @@ function drawNearestNeighbor(tour_coords){
                 strokeWeight: 2
             });
             linePath.setMap(map);
+            linePaths.push(linePath);
         }
     }, 100);
 }
@@ -199,6 +199,9 @@ function addMarker() {
 function clear(evt) {
     evt.preventDefault();
     linePath.setMap(null);
+    for (var i=0; i<linePaths.length; i++){
+        linePaths[i].setMap(null);
+    }
 }
 
 function drop() {
@@ -219,6 +222,9 @@ function handleFormSubmit(evt) {
         dataType: "json",
         success: function( data ) {
             linePath.setMap(null);
+            for (var i=0; i<linePaths.length; i++){
+                    linePaths[i].setMap(null);
+                }
             var image = data.img_file;
             var tour_coords = data.tour_coords;
             $('#plot').attr("src", data.img_file);
@@ -266,6 +272,8 @@ function get_cities_list(){
     });
 }
 });
+
+
 
 
 
