@@ -185,6 +185,20 @@ function drawNearestNeighbor(tour_coords){
     }, 100);
 }
 
+function drawAnimation(animation_steps){
+    //Here we animate
+    var i=0;
+    var drawFunction;
+    drawFunction = setInterval(function () {
+        console.log(animation_steps[i]); //The animation steps are there!
+        drawLine(animation_steps[i]); // can I call this function here???
+        i+=1;
+    if (i>4){
+        clearInterval(drawFunction);
+    }
+    }, 100);
+}
+
 function addMarker() {
           markers.push(new google.maps.Marker({
             position: cities[iterator],
@@ -227,6 +241,8 @@ function handleFormSubmit(evt) {
                 }
             var image = data.img_file;
             var tour_coords = data.tour_coords;
+            var animation_steps = data.animation_steps;
+            console.log(animation_steps);
             $('#plot').attr("src", data.img_file);
             $('#number').text(data.iterations);
             $('#score').text(data.best_score);
@@ -237,6 +253,7 @@ function handleFormSubmit(evt) {
             else
             {
                 drawLine(tour_coords);
+                //drawAnimation(animation_steps);
             }
       }
 });

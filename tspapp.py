@@ -41,35 +41,39 @@ def get_parameters():
     #Choose our algorithm
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
+    animation_steps = []
     if algorithm == "hillclimb":
-        result = tsp.hillclimb(init_function, tsp.reversed_sections, 
+        result_hill = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
+        num_evaluations, best_score, best, animation_steps = result_hill
     elif algorithm == "hill_restart":
-        result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
+        result_hill = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
+        num_evaluations, best_score, best, animation_steps = result_hill
     elif algorithm == "nearest":
-        result = tsp.greedy(matrix, start_city)
+        result = tsp.greedy(matrix, start_city)      
+        num_evaluations, best_score, best = result
     elif algorithm == "annealing":
         if move_operator == 'swapped_cities':
             result = tsp.anneal(init_function, tsp.swapped_cities, objective_function,
             cycles,start_temp,alpha)
+            num_evaluations, best_score, best = result
         else:
             result = tsp.anneal(init_function, tsp.reversed_sections, objective_function,
             cycles,start_temp,alpha)
+            num_evaluations, best_score, best = result
     else:
         print "error"
         return "error"
-
-    num_evaluations, best_score, best = result
-
+    
     #write to map
 
-    tour_coords = tsp.drawtour_on_map(coords,best)
+    tour_coords = tsp.drawtour_on_map(coords,best) #not using this at the moment so may remove
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
-     "tour_coords": tour_coords, "tour_cities": tour_cities}
+     "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_steps": animation_steps}
     data = json.dumps(results)
     return data
 
@@ -79,7 +83,6 @@ def convert_tour_to_city(best):
     for city in best:
         city_list.append(nodes[city].city)
     return city_list
-
 
 
 if __name__ == "__main__":

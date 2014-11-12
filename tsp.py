@@ -121,7 +121,6 @@ def tour_length(matrix,tour):
         total+=matrix[city_i,city_j]
     return total
 
-
 def all_pairs(size,shuffle=random.shuffle):
     r1=range(size)
     r2=range(size)
@@ -231,13 +230,14 @@ def hillclimb(
     best_score=objective_function(best)
     
     num_evaluations=1
-
+    animation_steps = []
     logging.info('hillclimb started: score=%f',best_score)
     
     while num_evaluations < max_evaluations:
         # examine moves around our current position
         move_made=False
         for next in move_operator(best):
+            animation_steps.append(best)
             if num_evaluations >= max_evaluations:
                 break
             
@@ -253,8 +253,7 @@ def hillclimb(
         if not move_made:
             break # we couldn't find a better move 
                      # (must be at a local maximum)
-    logging.info('hillclimb finished: num_evaluations=%d, best_score=%f',num_evaluations,best_score)
-    return (num_evaluations,best_score,best)
+    return (num_evaluations,best_score,best, animation_steps)
 
 def hillclimb_and_restart(
     init_function,
@@ -271,7 +270,7 @@ def hillclimb_and_restart(
     while num_evaluations < max_evaluations:
         remaining_evaluations=max_evaluations-num_evaluations
         
-        evaluated,score,found=hillclimb(
+        evaluated,score,found, animation_steps=hillclimb(
             init_function,
             move_operator,
             objective_function,
@@ -282,20 +281,18 @@ def hillclimb_and_restart(
             best_score=score
             best=found
         
-    return (num_evaluations,best_score,best)
+    return (num_evaluations,best_score,best,animation_steps)
 
 
 #Nearest Neighbor algorithm
 def greedy(dist, start_city):
 
-    print start_city
     '''solve using the greedy algorithm.'''
     n = int(math.sqrt(len(dist)))
 
     current_city = start_city
     unvisited_cities = set(range(0, n))
     unvisited_cities.remove(current_city)#remove current city from the set of unvisited cities
-    print unvisited_cities
     solution = [current_city]
 
     def distance_from_current_city(to):
