@@ -1,6 +1,7 @@
 from flask import Flask, request, session as fsksession, render_template, g, redirect, url_for, flash
 import os, jinja2, random, string, json, sys
 import tsp, model
+#import credentials
 
 app = Flask(__name__)
 app.secret_key = '\xf5!\x07!qj\xa4\x08\xc6\xf8\n\x8a\x95m\xe2\x04g\xbb\x98|U\xa2f\x03'
