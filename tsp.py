@@ -230,6 +230,7 @@ def hillclimb(
     
     num_evaluations=1
     animation_steps = []
+    current_score = []
     logging.info('hillclimb started: score=%f',best_score)
     
     while num_evaluations < max_evaluations:
@@ -237,6 +238,8 @@ def hillclimb(
         move_made=False
         for next in move_operator(best):
             animation_steps.append(best)
+            current_score.append(best_score)
+            print current_score, len(current_score)
             if num_evaluations >= max_evaluations:
                 break
             
@@ -252,7 +255,7 @@ def hillclimb(
         if not move_made:
             break # we couldn't find a better move 
                      # (must be at a local maximum)
-    return (num_evaluations,best_score,best, animation_steps)
+    return (num_evaluations,best_score,best, animation_steps, current_score)
 
 def hillclimb_and_restart(
     init_function,
@@ -269,7 +272,7 @@ def hillclimb_and_restart(
     while num_evaluations < max_evaluations:
         remaining_evaluations=max_evaluations-num_evaluations
         
-        evaluated,score,found, animation_steps=hillclimb(
+        evaluated,score,found, animation_steps, current_score=hillclimb(
             init_function,
             move_operator,
             objective_function,
@@ -280,7 +283,7 @@ def hillclimb_and_restart(
             best_score=score
             best=found
         
-    return (num_evaluations,best_score,best,animation_steps)
+    return (num_evaluations,best_score,best,animation_steps, current_score)
 
 
 #Nearest Neighbor algorithm
@@ -342,10 +345,12 @@ class ObjectiveFunction:
         self.best=None
         self.best_score=None
         self.steps=[]
+        self.score_list=[]
     
     def __call__(self,solution):
-        self.steps.append(solution)
+        self.steps.append(solution)       
         score=self.objective_function(solution)
+        self.score_list.append(score)
         if self.best is None or score > self.best_score:
             self.best_score=score
             self.best=solution
@@ -391,13 +396,15 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
         # see if completely finished
         if done: break
     
-    best_score=objective_function.best_score
-    best=objective_function.best
+    best_score=objective_function.best_score #This is the final route (miles)
+    best=objective_function.best #Nodes that make up the best route
+    score_list=objective_function.score_list
+
     #print 'final temperature: %f'%temperature
     #print num_evaluations, best_score
     #print 'anneal finished: num_evaluations=%d, best_score=%f'%num_evaluations,best_score
-    print objective_function.steps
-    return (num_evaluations,best_score,best, objective_function.steps)
+    print score_list
+    return (num_evaluations,best_score,best, objective_function.steps, score_list)
 
 
 

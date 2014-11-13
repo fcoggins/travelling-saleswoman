@@ -32,6 +32,9 @@ def get_parameters():
     move_operator = request.form['move_operator']
     start_city = int(request.form['start'])
 
+    current_score=[] #initialize here so that I don't get an error
+    animation_coords = []
+
     nodes = model.session.query(model.City).all()
     coords = tsp.read_coords_db(nodes)
     #To calculate the distance matrix on the fly. This is faster for 48 capital
@@ -45,11 +48,11 @@ def get_parameters():
     if algorithm == "hillclimb":
         result = tsp.hillclimb(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps = result
+        num_evaluations, best_score, best, animation_steps, current_score = result
     elif algorithm == "hill_restart":
         result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
             objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps = result
+        num_evaluations, best_score, best, animation_steps, current_score = result
     elif algorithm == "nearest":
         result = tsp.greedy(matrix, start_city)      
         num_evaluations, best_score, best = result
@@ -57,11 +60,11 @@ def get_parameters():
         if move_operator == 'swapped_cities':
             result = tsp.anneal(init_function, tsp.swapped_cities, objective_function,
             cycles,start_temp,alpha)
-            num_evaluations, best_score, best, animation_steps = result
+            num_evaluations, best_score, best, animation_steps, current_score = result
         else:
             result = tsp.anneal(init_function, tsp.reversed_sections, objective_function,
             cycles,start_temp,alpha)
-            num_evaluations, best_score, best, animation_steps = result
+            num_evaluations, best_score, best, animation_steps, current_score = result
     else:
         print "error"
         return "error"
@@ -71,14 +74,15 @@ def get_parameters():
     tour_coords = tsp.drawtour_on_map(coords,best)
 
     #coordinates for each step
-    animation_coords = []
+    
     for i in range(len(animation_steps)):
         animation_coords.append(tsp.drawtour_on_map(coords, animation_steps[i]))
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
-     "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_coords": animation_coords}
+     "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_coords": animation_coords, 
+     "current_score": current_score}
     data = json.dumps(results)
     return data
 

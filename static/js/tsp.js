@@ -4,12 +4,13 @@ var cities = [];
 var markers = [];
 var iterator = 0;
 var map;
-var linePath, iterations, best_score, tour_cities, tour_coords;
+var linePath, iterations, best_score, tour_cities, tour_coords, current_score;
 var drawAnimationFunction;
 var linePaths = [];
+var cities_string = "";
 
 google.maps.event.addDomListener(window, 'load', initialize);
-get_cities_list();
+get_cities_list(); //populate the cities dropdown 
 $("#userinput").on("submit", handleFormSubmit);
 $("#drop").on("click", get_cities_data);
 $("#clear").on("click", clear);
@@ -148,6 +149,7 @@ function drawNearestNeighbor(tour_coords){
     var i=0;
     linePaths = [];
     var drawFunction;
+    //$("#stop").disabled = true; //stop button messes up the nearest neighbor
     drawFunction = setInterval(function () {
         j = i + 1;
         lat1 = tour_coords[i][0];
@@ -189,19 +191,16 @@ function drawNearestNeighbor(tour_coords){
 }
 
 function drawAnimation(animation_coords){
-    //Here we animate
     var i=0;
-    //drawLine(animation_coords[i]); //need to pass the coords.. not just the steps
-
     drawAnimationFunction = setInterval(function () {
-
         drawLine(animation_coords[i]);
         $('#number').text(i+1);
+        $('#score').text(current_score[i]); //here we need to add the current route length
         i+=1;
-
-    if (i>(animation_coords.length - 1)){
-        clearInterval(drawAnimationFunction);
-    }
+        if (i>(animation_coords.length - 1)){
+            clearInterval(drawAnimationFunction);
+            $('#route').text(cities_string);//write the route here
+        }
     }, 100);
 }
 
@@ -217,25 +216,22 @@ function addMarker() {
         }
 
 function clear() {
-    //evt.preventDefault();
-    clearInterval(drawAnimationFunction);
+    clearInterval(drawAnimationFunction);//stop the animation running
     $('#number').empty();
     $('#score').empty();
     $('#route').empty();
-    linePath.setMap(null);
+    linePath.setMap(null);//remove best route from map
     for (var i=0; i<linePaths.length; i++){
-        linePaths[i].setMap(null);
+        linePaths[i].setMap(null);//remove the individual legs from map(Nearest Neighbor)
     }
 }
 
 function stop() {
     clearInterval(drawAnimationFunction);
-    //draw the best path here
     drawLine(tour_coords);
     $('#number').text(iterations);
-    //enter the results
     $('#score').text(best_score);
-    $('#route').text(tour_cities);
+    $('#route').text(cities_string);
 }
 
 function drop() {
@@ -264,12 +260,17 @@ function handleFormSubmit(evt) {
             tour_coords = data.tour_coords;
             var animation_coords = data.animation_coords;
             iterations = data.iterations;
-            best_score = data.best_score;
+            best_score = -data.best_score.toFixed(0);
             tour_cities = data.tour_cities;
+
+            for (var k=0; k < tour_cities.length; k++){              
+                cities_string += tour_cities[k] + ', ';
+            }
+            current_score = data.current_score;
+            for (var j=0; j < current_score.length; j++){
+                current_score[j] = -current_score[j].toFixed(0);
+            }
             // $('#plot').attr("src", data.img_file);
-            // $('#number').text(iterations);
-            // $('#score').text(best_score);
-            // $('#route').text(tour_cities);
             if($('#algorithm').val() == 'nearest'){
                 drawNearestNeighbor(tour_coords);
             }
