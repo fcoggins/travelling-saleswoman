@@ -4,7 +4,7 @@ var cities = [];
 var markers = [];
 var iterator = 0;
 var map;
-var linePath, iterations, best_score, tour_cities, tour_coords, current_score;
+var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour;
 var drawAnimationFunction;
 var linePaths = [];
 var cities_string = "";
@@ -196,7 +196,7 @@ function drawAnimation(animation_coords){
     drawAnimationFunction = setInterval(function () {
         drawLine(animation_coords[i]);
         $('#number').text(i+1);
-        $('#score').text(current_score[i]); //here we need to add the current route length
+        $('#score').text(current_score[i]);//here we add the current route length
         i+=1;
         if (i>(animation_coords.length - 1)){
             clearInterval(drawAnimationFunction);
@@ -252,18 +252,24 @@ function handleFormSubmit(evt) {
         data: $('#userinput').serialize(),
         dataType: "json",
         success: function( data ) {
+          //initialize everything
             linePath.setMap(null);
+            iterations = null;
+            best_score = null;
+            cities_string = "";
+            polyline_best_tour = [];
             for (var i=0; i<linePaths.length; i++){
                     linePaths[i].setMap(null);
                 }
             clear();
+
+            //import our data
             var image = data.img_file;
             tour_coords = data.tour_coords;
             var animation_coords = data.animation_coords;
             iterations = data.iterations;
             best_score = -data.best_score.toFixed(0);
             tour_cities = data.tour_cities;
-
             for (var k=0; k < tour_cities.length; k++){              
                 cities_string += tour_cities[k] + ', ';
             }
@@ -271,6 +277,10 @@ function handleFormSubmit(evt) {
             for (var j=0; j < current_score.length; j++){
                 current_score[j] = -current_score[j].toFixed(0);
             }
+            polyline_best_tour = data.poly_list;
+
+
+            //Draw on our map
             // $('#plot').attr("src", data.img_file);
             if($('#algorithm').val() == 'nearest'){
                 drawNearestNeighbor(tour_coords);
@@ -323,16 +333,16 @@ function get_cities_list(){
 $("#test").on("click", addEncodedPaths);
 
 function addEncodedPaths() {
-    var encodedFlightPaths = [
-      "_ricG`odaM{mMreYgkMpxWciMfiFk`Jfmo@_oBtpNhdI|bRsjA~gQg}GrsJmwHzbY}cG|pw@_qKjuXuuAped@zxDxetAotCteqAtaZx_mBLzmvAcjL~toAbxD`kjBvgJ|teA|{Bl}d@bwQ~cD|mPpgF~sL~kT|jZ~ka@tuIfzXpbSvxl@zlYfxu@vrg@zg`AjrRxyjAbuT|vp@hgRrofAhji@tbnBpbHreLcOx|]xq@~gY`iGngHt`EzcN~fL~lpAecJzorAozXrgqAgrPtdjAs^h`eCqdCplp@kfHjpVepLlh\\c_Avj\\tMxsy@djCvttBkr@zpxAduN|zi@vrKdtV|kBjid@weB`lm@vbDhyAe`An~l@~|Ct|_AvpKplw@h~Dp_ZfeMhxUpw@|sg@jr@zxgAqpD|d~Af`A|`j@uyDfvnAe}CbfJ_oDrh]_{Pn`@o_FjmICd~`@scFhdy@soDfmdAavE~p~Efx@rd{CbpE`smA`o@nag@boIrkEf|Gtv\\r_Iluq@oGrb`@iGdlwBiCfaiBhu\\l{]jsUdfX|Y~qXhp@`|Vl`PzxP~kGfsOxaJd`Dh}Ujxc@v`Ityl@`zGvjK}Zta[{DhmiBe@`fdBzOxvlAdhMllm@jmM~grBczCjpiAyfjAvreEioGhtx@r`@bfbA@tghAh|Fvlq@vmF`efAo`MhydAaMv{mAwqOtep@__Cvu{@`wDrhqAfmGtyc@nXpjaBxpEnds@jxAjxj@yoGbsa@_wXni[}nChyO{jHbqFsgCbe]yxQ`of@ktYhhl@apQxd`@uoH`xb@{gF|ndClfFfnpApsLll}@h{CvytBusDrea@zQth^z~Mdjt@p_L~ye@mjDlrVjwAjmg@hCnc_@jhM|q\\`gUrx{@hfJp{f@uCnvZrxDhxXzf@ht\\vqNz~[foNxoNdlZzfj@nmToqGvgKbtKjnGdtBc|@tfTbhBvq^jcDfzMuaFvqPifCxc]l`FnnYhhIl`Nr[~yXciGfp[q`SppaAv|Q~sq@u~Abb{CwdCzv`@{b\\`pc@gc_@het@}bF~mi@blArbx@dzNvtz@ftLth\\h`D~iXv~HxvGhwOzhZ|nLnkZnu@tz\\psLtqc@__Jrn]vrG~pq@biDbp]cwL`xOmgPvdUegZfvq@oxFnkYypDdiFqmAjrRx|Tv|p@ldc@byZtcLdw\\hpIn}Jt}VnwCxv]zhJhh^nu]drJdpT~cWrnQt{f@dzbAnl]t}`@huJj]dtLc_DnqHboBrlQfcn@rrSb}\\zlJz}["
-];
-    for( var i = 0, n = encodedFlightPaths.length;  i < n;  i++ ) {
-        addEncodedPath( encodedFlightPaths[i] );
+    console.log(polyline_best_tour);
+    for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
+        //addEncodedPath( encodedFlightPaths[i] );
+        console.log("Hey");
     }
 }
 
 function addEncodedPath( encodedPath ) {
     console.log('hello');
+
     var path = google.maps.geometry.encoding.decodePath( encodedPath );
 
     var polyline = new google.maps.Polyline({

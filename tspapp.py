@@ -104,9 +104,14 @@ def get_parameters():
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)
+    if mode == "roads":
+        poly_list = poly_line_tour(best)
+    else:
+        poly_list = []
+
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
      "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_coords": animation_coords, 
-     "current_score": current_score}
+     "current_score": current_score, "poly_list": poly_list}
     data = json.dumps(results)
     return data
 
@@ -116,6 +121,17 @@ def convert_tour_to_city(best):
     for city in best:
         city_list.append(nodes[city].city)
     return city_list
+
+def poly_line_tour(best):
+    '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
+    which is a list of polylines [line1, line2 .... linex]'''
+
+    distances = model.session.query(model.Distance).all()
+    print best
+    poly_list = []
+    #We need to build our polylist and put into database
+    poly_list = ['hello', 'world', 'this rocks', 'maybe']
+    return poly_list
 
 
 if __name__ == "__main__":
