@@ -17,6 +17,7 @@ $("#clear").on("click", clear);
 $("#stop").on("click", stop);
 
 
+
 function initialize(){
     // Create an array of styles.
     var styles = [
@@ -312,8 +313,39 @@ function get_cities_list(){
         }
     });
 }
-});
 
+//draw actual road paths
+
+
+
+
+
+$("#test").on("click", addEncodedPaths);
+
+function addEncodedPaths() {
+    var encodedFlightPaths = [
+      "_ricG`odaM{mMreYgkMpxWciMfiFk`Jfmo@_oBtpNhdI|bRsjA~gQg}GrsJmwHzbY}cG|pw@_qKjuXuuAped@zxDxetAotCteqAtaZx_mBLzmvAcjL~toAbxD`kjBvgJ|teA|{Bl}d@bwQ~cD|mPpgF~sL~kT|jZ~ka@tuIfzXpbSvxl@zlYfxu@vrg@zg`AjrRxyjAbuT|vp@hgRrofAhji@tbnBpbHreLcOx|]xq@~gY`iGngHt`EzcN~fL~lpAecJzorAozXrgqAgrPtdjAs^h`eCqdCplp@kfHjpVepLlh\\c_Avj\\tMxsy@djCvttBkr@zpxAduN|zi@vrKdtV|kBjid@weB`lm@vbDhyAe`An~l@~|Ct|_AvpKplw@h~Dp_ZfeMhxUpw@|sg@jr@zxgAqpD|d~Af`A|`j@uyDfvnAe}CbfJ_oDrh]_{Pn`@o_FjmICd~`@scFhdy@soDfmdAavE~p~Efx@rd{CbpE`smA`o@nag@boIrkEf|Gtv\\r_Iluq@oGrb`@iGdlwBiCfaiBhu\\l{]jsUdfX|Y~qXhp@`|Vl`PzxP~kGfsOxaJd`Dh}Ujxc@v`Ityl@`zGvjK}Zta[{DhmiBe@`fdBzOxvlAdhMllm@jmM~grBczCjpiAyfjAvreEioGhtx@r`@bfbA@tghAh|Fvlq@vmF`efAo`MhydAaMv{mAwqOtep@__Cvu{@`wDrhqAfmGtyc@nXpjaBxpEnds@jxAjxj@yoGbsa@_wXni[}nChyO{jHbqFsgCbe]yxQ`of@ktYhhl@apQxd`@uoH`xb@{gF|ndClfFfnpApsLll}@h{CvytBusDrea@zQth^z~Mdjt@p_L~ye@mjDlrVjwAjmg@hCnc_@jhM|q\\`gUrx{@hfJp{f@uCnvZrxDhxXzf@ht\\vqNz~[foNxoNdlZzfj@nmToqGvgKbtKjnGdtBc|@tfTbhBvq^jcDfzMuaFvqPifCxc]l`FnnYhhIl`Nr[~yXciGfp[q`SppaAv|Q~sq@u~Abb{CwdCzv`@{b\\`pc@gc_@het@}bF~mi@blArbx@dzNvtz@ftLth\\h`D~iXv~HxvGhwOzhZ|nLnkZnu@tz\\psLtqc@__Jrn]vrG~pq@biDbp]cwL`xOmgPvdUegZfvq@oxFnkYypDdiFqmAjrRx|Tv|p@ldc@byZtcLdw\\hpIn}Jt}VnwCxv]zhJhh^nu]drJdpT~cWrnQt{f@dzbAnl]t}`@huJj]dtLc_DnqHboBrlQfcn@rrSb}\\zlJz}["
+];
+    for( var i = 0, n = encodedFlightPaths.length;  i < n;  i++ ) {
+        addEncodedPath( encodedFlightPaths[i] );
+    }
+}
+
+function addEncodedPath( encodedPath ) {
+    console.log('hello');
+    var path = google.maps.geometry.encoding.decodePath( encodedPath );
+
+    var polyline = new google.maps.Polyline({
+        path: path,
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+    polyline.setMap( map );
+}
+
+
+});
 
 
 
