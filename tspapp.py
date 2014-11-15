@@ -32,28 +32,51 @@ def get_parameters():
     alpha = float(request.form['alpha'])
     move_operator = request.form['move_operator']
     start_city = int(request.form['start'])
+    mode = request.form['mode']
+
+    print mode
 
     current_score=[] #initialize here so that I don't get an error
     animation_coords = []
 
     nodes = model.session.query(model.City).all()
     coords = tsp.read_coords_db(nodes)
-    #To calculate the distance matrix on the fly. This is faster for 48 capital
-    #cities.
-    matrix = tsp.distance_matrix(coords) 
+
+    #The distance matrix is of the form {(i, j): dist, ... (i,j): dist} where i and
+    #j are between 0 and the number of nodes. In the 48 cities data the city_id is
+    #from one to the number of nodes(inclusive) 1 - 48 and the relationship is city_id = i + 1.
+    if mode == "as_the_crow_flies":
+        matrix = tsp.distance_matrix(coords)
+    elif mode == "roads":
+        matrix = tsp.road_matrix() 
+    else:
+        return "Error"
 
     #Choose our algorithm
     init_function =lambda: tsp.init_random_tour(len(coords))
     objective_function=lambda tour: -tsp.tour_length(matrix,tour) #note negation
     animation_steps = []
     if algorithm == "hillclimb":
-        result = tsp.hillclimb(init_function, tsp.reversed_sections, 
-            objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps, current_score = result
+        if move_operator == 'swapped_cities':
+            result = tsp.hillclimb(init_function, tsp.swapped_cities, 
+                objective_function, cycles)
+            num_evaluations, best_score, best, animation_steps, current_score = result
+        else:
+            result = tsp.hillclimb(init_function, tsp.reversed_sections, 
+                objective_function, cycles)
+            num_evaluations, best_score, best, animation_steps, current_score = result
+    #hillclimb and restart doesn't show the entire algorithm, just the last one I think.
+    #put some thought into how to display this.
     elif algorithm == "hill_restart":
-        result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
-            objective_function, cycles)
-        num_evaluations, best_score, best, animation_steps, current_score = result
+        if move_operator == 'swapped_cities':
+            result = tsp.hillclimb_and_restart(init_function, tsp.swapped_cities, 
+                objective_function, cycles)
+            num_evaluations, best_score, best, animation_steps, current_score = result
+        else:
+            result = tsp.hillclimb_and_restart(init_function, tsp.reversed_sections, 
+                objective_function, cycles)
+            num_evaluations, best_score, best, animation_steps, current_score = result
+
     elif algorithm == "nearest":
         result = tsp.greedy(matrix, start_city)      
         num_evaluations, best_score, best = result
@@ -77,7 +100,7 @@ def get_parameters():
     #coordinates for each step
     
     for i in range(len(animation_steps)):
-        animation_coords.append(tsp.drawtour_on_map(coords, animation_steps[i]))
+        animation_coords.append(tsp.drawtour_on_map(coords, animation_steps[i]))    
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)

@@ -58,41 +58,42 @@ def distance_between_two_cities(lat1, lon1, lat2, lon2):
     dist = R * 2 * math.asin(math.sqrt(a)) * 0.621371 #convert to miles
     return dist
 
-# def distance_matrix_from_db():
+def road_matrix():
 #     '''This will pull data from our database table of 48 us cities into a matrix 
 #     to be used for tour length calculations. It will look like {(city1_id, city2_id):
-#     distance, (cityn_id, citym_id): distance, ...}. This is done to avoid recalculating
-#     distances each time an algorithm is called'''
+#     distance, (cityn_id, citym_id): distance, ...}.'''
 
-#     matrix = {}
-#     distances = model.session.query(model.Distance).all()
-#     length = int(math.sqrt(len(distances)))
-#     print length
+    matrix = {}
+    #distances = model.session.query(model.Distance).all()
+    nodes = model.session.query(model.City).all()
+    #length = int(math.sqrt(len(distances)))
+    print len(nodes)
 #     #since this is a symetric problem we only have to calculate the matrix from i to j
 #     #and not from j to i. However, tour length only looks for the tuple which is the key
 #     #in on direction so we may have to build the second half of the matrix.
-#     for i in range(length):
-#         for j in range(i+1, length):
-#             city1 = i + 1
-#             city2 = j + 1
-#             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
-#                 filter(model.Distance.city2_id == city2).first()
-#             #print i, j, miles.miles
-#             matrix[(i, j)] = miles.miles
-#             matrix[(j, i)] = matrix[(i, j)]
-#     #print_nice_matrix(matrix)
-#     return matrix
+    for i in range(len(nodes)):
+        city1 = i + 1
+        matrix[(i, i)] = 0
+        for j in range(i+1, len(nodes)):           
+            city2 = j + 1
+            miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
+                filter(model.Distance.city2_id == city2).first()
+            #print i, j, miles.miles
+            matrix[(i, j)] = miles.road_miles
+            matrix[(j, i)] = matrix[(i, j)]
+    #print_nice_matrix(matrix)
+    return matrix
 
-# def print_nice_matrix(matrix):
-#     '''Print a nice distance matrix that is readable by humans. Used for debugging'''
+def print_nice_matrix(matrix):
+    '''Print a nice distance matrix that is readable by humans. Used for debugging'''
 
-#     print len(matrix)
-#     print math.sqrt(len(matrix))
-#     length = int(math.sqrt(len(matrix)))
-#     print length
-#     for i in range(length):
-#     	for j in range (i+1, length):
-#     		print "Distance from %d to %d is %0.0f"%(i, j, matrix[i,j])
+    print len(matrix)
+    length = int(math.sqrt(len(matrix)))
+    for i in range(length):
+        city1 = i + 1
+    	for j in range (length):
+            city2 = j + 1
+            print "Distance from %d to %d is %0.0f"%(city1, city2, matrix[(i, j)])
 
 # def look_up_distance(city1, city2):
 #     '''Look up the distance between any two cities from the database. This does 
@@ -229,21 +230,22 @@ def hillclimb(
     best_score=objective_function(best)
     
     num_evaluations=1
-    animation_steps = []
-    current_score = []
-    logging.info('hillclimb started: score=%f',best_score)
+    animation_steps = [] #keep track of intermediate tour routes
+    current_score = [] #keep track of intermediate scores
     
     while num_evaluations < max_evaluations:
+        # If we append here we will show the total animation steps (minus last one
+        # but this makes for a more boring animation.) Clicking stop gives best solution.
         # examine moves around our current position
         move_made=False
         for next in move_operator(best):
-            animation_steps.append(best)
-            current_score.append(best_score)
-            print current_score, len(current_score)
+            
             if num_evaluations >= max_evaluations:
+
                 break
             
             # see if this move is better than the current
+
             next_score=objective_function(next)
             num_evaluations+=1
             if next_score > best_score:
@@ -255,6 +257,15 @@ def hillclimb(
         if not move_made:
             break # we couldn't find a better move 
                      # (must be at a local maximum)
+
+        #if we append here we are only appending those steps that are improvements
+        #to the animation which speeds it up. This works for basic hillclimb but
+        #not for hillclimb and restart, which stops the animation at only one try.
+        #animation steps that are not improvements are not shown in the count.
+        animation_steps.append(best)
+        current_score.append(best_score)
+        print len(animation_steps)
+        print current_score
     return (num_evaluations,best_score,best, animation_steps, current_score)
 
 def hillclimb_and_restart(
@@ -403,7 +414,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     #print 'final temperature: %f'%temperature
     #print num_evaluations, best_score
     #print 'anneal finished: num_evaluations=%d, best_score=%f'%num_evaluations,best_score
-    print score_list
+    #print score_list
     return (num_evaluations,best_score,best, objective_function.steps, score_list)
 
 

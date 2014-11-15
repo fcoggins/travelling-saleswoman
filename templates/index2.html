@@ -81,7 +81,16 @@
                      <label for="scaling">Scaling factor</label>
                     <input type="text" id="scaling" name="scaling" value = "0.09">
                     <br>
- -->                <label for="algorithm">Algorithm:</label>
+
+ -->                
+                    <label for="mode">Mode:</label>
+
+                    <select id="mode" name="mode">
+                        <option value="as_the_crow_flies">As the crow flies</option>
+                        <option value="roads">Road distance</option>
+                    </select>
+
+                    <label for="algorithm">Algorithm:</label>
                     <select id="algorithm" name="algorithm">
                         <option value="hillclimb">Basic Hillclimb</option>
                         <option value="hill_restart">Hillclimb & Restart</option>
