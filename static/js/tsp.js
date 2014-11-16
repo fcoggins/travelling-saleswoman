@@ -335,7 +335,7 @@ $("#test").on("click", addEncodedPaths);
 function addEncodedPaths() {
     console.log(polyline_best_tour);
     for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
-        //addEncodedPath( encodedFlightPaths[i] );
+        addEncodedPath( polyline_best_tour[i] );
         console.log("Hey");
     }
 }

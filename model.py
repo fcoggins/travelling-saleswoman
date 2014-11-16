@@ -31,7 +31,7 @@ class Distance(Base):
     city2_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
     miles = Column(Float)
     road_miles = Column(Float)
-    polyline = Column(String(100000))
+    polyline = Column(String(10000))
 #     city1 = relationship("City", foreign_keys="city1_id")
 #     city2 = relationship("City", foreign_keys="city2_id")
 

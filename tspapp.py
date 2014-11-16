@@ -34,8 +34,6 @@ def get_parameters():
     start_city = int(request.form['start'])
     mode = request.form['mode']
 
-    print mode
-
     current_score=[] #initialize here so that I don't get an error
     animation_coords = []
 
@@ -124,13 +122,29 @@ def convert_tour_to_city(best):
 
 def poly_line_tour(best):
     '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
-    which is a list of polylines [line1, line2 .... linex]'''
+    which is a list of polylines [line1, line2 .... linex] for 48 cities best
+    includes each of the nodes from 0 to 47 once.'''
 
     distances = model.session.query(model.Distance).all()
     print best
     poly_list = []
+    for i in range(len(best)):
+        city1 = best[i]+1
+        city2 = best[(i+1)%len(best)]+1
+        if city1 > city2:
+            temp = city1
+            city1 = city2
+            city2 = temp
+        print city1
+        print city2
+        distance = model.session.query(model.Distance).filter_by(city1_id = city1).filter_by(city2_id = city2).first()
+        #dist_object = model.session.query(model.Distance).filter_by(city1_id=i,city2_id=j).first()
+        print distance
+        polyline = distance.polyline
+        poly_list.append(polyline)
+
     #We need to build our polylist and put into database
-    poly_list = ['hello', 'world', 'this rocks', 'maybe']
+    print poly_list
     return poly_list
 
 

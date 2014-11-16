@@ -67,7 +67,7 @@ def road_matrix():
     #distances = model.session.query(model.Distance).all()
     nodes = model.session.query(model.City).all()
     #length = int(math.sqrt(len(distances)))
-    print len(nodes)
+    #print len(nodes)
 #     #since this is a symetric problem we only have to calculate the matrix from i to j
 #     #and not from j to i. However, tour length only looks for the tuple which is the key
 #     #in on direction so we may have to build the second half of the matrix.
@@ -87,7 +87,6 @@ def road_matrix():
 def print_nice_matrix(matrix):
     '''Print a nice distance matrix that is readable by humans. Used for debugging'''
 
-    print len(matrix)
     length = int(math.sqrt(len(matrix)))
     for i in range(length):
         city1 = i + 1
@@ -264,8 +263,8 @@ def hillclimb(
         #animation steps that are not improvements are not shown in the count.
         animation_steps.append(best)
         current_score.append(best_score)
-        print len(animation_steps)
-        print current_score
+        #print len(animation_steps)
+        #print current_score
     return (num_evaluations,best_score,best, animation_steps, current_score)
 
 def hillclimb_and_restart(
