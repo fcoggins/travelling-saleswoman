@@ -64,13 +64,13 @@ def road_matrix():
 #     distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
-    #distances = model.session.query(model.Distance).all()
+
     nodes = model.session.query(model.City).all()
-    #length = int(math.sqrt(len(distances)))
-    #print len(nodes)
-#     #since this is a symetric problem we only have to calculate the matrix from i to j
-#     #and not from j to i. However, tour length only looks for the tuple which is the key
-#     #in on direction so we may have to build the second half of the matrix.
+
+# since this is a symetric problem we only have to calculate the matrix from i to j
+# and not from j to i. However, tour length only looks for the tuple which is the key
+# in on direction so we may have to build the second half of the matrix.
+
     for i in range(len(nodes)):
         city1 = i + 1
         matrix[(i, i)] = 0

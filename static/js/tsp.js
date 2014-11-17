@@ -221,17 +221,17 @@ function addMarker() {
 //draw actual road paths
 
 function addEncodedPaths() {
+    var path;
+    var paths=[];
     for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
-        addEncodedPath( polyline_best_tour[i] );
+        path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
+        paths = paths.concat(path);
+        //path += path;
+        console.log(i, paths);
     }
-}
-
-function addEncodedPath( encodedPath ) {
-
-    var path = google.maps.geometry.encoding.decodePath( encodedPath );
 
     polyline = new google.maps.Polyline({
-        path: path,
+        path: paths,
         strokeColor: "#0000FF",
         strokeOpacity: 1.0,
         strokeWeight: 2

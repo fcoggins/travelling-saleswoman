@@ -5,28 +5,30 @@ import credentials
 
 def load_directions(session):
 
-    api_key = credentials.API_KEY_2
+    api_key = credentials.API_KEY
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     nodes = model.session.query(model.City).all()
-    for i in range(34, len(nodes)):
+    for i in range(44, len(nodes)):
         city1 = nodes[i].city
         state1 = nodes[i].state
         city1_escaped = (city1 + "," + state1).replace(" ", "%20")
         city1_underscore = city1.replace (" ", "_")
-        for j in range(i+1, len(nodes)):
+        for j in range(len(nodes)):
             city2 = nodes[j].city
             state2 = nodes[j].state
             city2_escaped = (city2 + "," + state2).replace(" ", "%20")
             city2_underscore = city2.replace(" ", "_")
-            filename = "directions/"+city1_underscore+'-'+city2_underscore+".json"
+            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
             print filename
             parameters = 'origin='+city1_escaped+'&destination='+city2_escaped+'&key='
             request = Request(url + parameters + api_key)
             print url + parameters + api_key
             response = urlopen(request)
             results = response.read() #This gives me back JSON with directions
+            print "results"
             f = open(filename, 'w')
             f.write(results)
+            print "wrote file"
             f.close()
             time.sleep(1) #so google doesn't get upset
 
@@ -37,12 +39,17 @@ def read_directions_files(session):
     #loop through the cities in nodes and extract the city name to grab the file
     for i in range(len(nodes)):
         city1 = nodes[i].city
-        for j in range(i+1, len(nodes)):
+        for j in range(len(nodes)):
             city2 = nodes[j].city
+            print(i,j)
+            if city1 == city2:
+                print "Hello"
+                continue
             #parse into filename
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
-            filename = "directions/"+city1_underscore+'-'+city2_underscore+".json"
+            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
+            print filename
             f = open(filename)
             jsondata = f.read()
             data = json.loads(jsondata)
@@ -87,9 +94,9 @@ def load_cities(session):
 
 def main(session):
 
-    #read_directions_files(session)
+    read_directions_files(session)
     #load_directions(session)
-    load_distance(session)
+    #load_distance(session)
 
 
 if __name__ == "__main__":
