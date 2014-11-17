@@ -5,7 +5,8 @@ var markers = [];
 var iterator = 0;
 var map;
 var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour;
-var drawAnimationFunction, polyline;
+var drawAnimationFunction;
+var polyline;
 var linePaths = [];
 var cities_string = "";
 
@@ -227,7 +228,7 @@ function addEncodedPaths() {
         path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
         paths = paths.concat(path);
         //path += path;
-        console.log(i, paths);
+        //console.log(i, paths);
     }
 
     polyline = new google.maps.Polyline({
@@ -237,7 +238,7 @@ function addEncodedPaths() {
         strokeWeight: 2
     });
     polyline.setMap( map );
-    console.log(polyline);
+    //console.log(polyline);
 }
 
 function clear() {
@@ -247,8 +248,9 @@ function clear() {
     $('#route').empty();
     linePath.setMap( null );//remove best route from map(as the crow flies)
     console.log(linePath);
-    //console.log(polyline);
-    //polyline.setMap( null );//remove best route from map(Road distance)
+    if (polyline){
+      polyline.setMap( null );//remove best route from map(Road distance)
+    }
     for (var i=0; i<linePaths.length; i++){
         linePaths[i].setMap(null);//remove the individual legs from map(Nearest Neighbor)
     }
