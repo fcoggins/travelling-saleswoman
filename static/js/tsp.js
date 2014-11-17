@@ -5,7 +5,7 @@ var markers = [];
 var iterator = 0;
 var map;
 var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour;
-var drawAnimationFunction;
+var drawAnimationFunction, polyline;
 var linePaths = [];
 var cities_string = "";
 
@@ -123,6 +123,7 @@ function drawLine(tour_coords){
 
     var lineCoordinates = [];
     linePath.setMap(null);
+
     for (var i=0; i<tour_coords.length; i++){
         lat1 = tour_coords[i][0];
         long1 = -tour_coords[i][1];
@@ -140,6 +141,7 @@ function drawLine(tour_coords){
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
+
     linePath.setMap(map);
 }
 
@@ -216,12 +218,37 @@ function addMarker() {
           iterator++;
         }
 
+//draw actual road paths
+
+function addEncodedPaths() {
+    for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
+        addEncodedPath( polyline_best_tour[i] );
+    }
+}
+
+function addEncodedPath( encodedPath ) {
+
+    var path = google.maps.geometry.encoding.decodePath( encodedPath );
+
+    polyline = new google.maps.Polyline({
+        path: path,
+        strokeColor: "#0000FF",
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+    polyline.setMap( map );
+    console.log(polyline);
+}
+
 function clear() {
     clearInterval(drawAnimationFunction);//stop the animation running
     $('#number').empty();
     $('#score').empty();
     $('#route').empty();
-    linePath.setMap(null);//remove best route from map
+    linePath.setMap( null );//remove best route from map(as the crow flies)
+    console.log(linePath);
+    //console.log(polyline);
+    //polyline.setMap( null );//remove best route from map(Road distance)
     for (var i=0; i<linePaths.length; i++){
         linePaths[i].setMap(null);//remove the individual legs from map(Nearest Neighbor)
     }
@@ -287,8 +314,15 @@ function handleFormSubmit(evt) {
             }
             else
             {
-                //drawLine(tour_coords);
+              if($('#mode').val() == 'as_the_crow_flies'){
                 drawAnimation(animation_coords);
+              }
+              else if($('#mode').val() == 'roads'){
+                addEncodedPaths();
+              }
+              else{
+                console.log('error');
+              }
             }
       }
 });
@@ -322,36 +356,6 @@ function get_cities_list(){
             $('#start').html(text);
         }
     });
-}
-
-//draw actual road paths
-
-
-
-
-
-$("#test").on("click", addEncodedPaths);
-
-function addEncodedPaths() {
-    console.log(polyline_best_tour);
-    for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
-        addEncodedPath( polyline_best_tour[i] );
-        console.log("Hey");
-    }
-}
-
-function addEncodedPath( encodedPath ) {
-    console.log('hello');
-
-    var path = google.maps.geometry.encoding.decodePath( encodedPath );
-
-    var polyline = new google.maps.Polyline({
-        path: path,
-        strokeColor: "#0000FF",
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-    });
-    polyline.setMap( map );
 }
 
 
