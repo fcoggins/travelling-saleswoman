@@ -8,6 +8,7 @@ var linePath, iterations, best_score, tour_cities, tour_coords, current_score, p
 var drawAnimationFunction;
 var polyline;
 var linePaths = [];
+var neighborPaths = []
 var cities_string = "";
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -197,7 +198,13 @@ function drawNearestNeighbor(tour_coords){
 function drawAnimation(animation_coords){
     var i=0;
     drawAnimationFunction = setInterval(function () {
+      if($("#mode").val() == 'as_the_crow_flies'){
         drawLine(animation_coords[i]);
+      }
+      else
+      {
+        console.log(animation_coords[i]);
+      }
         $('#number').text(i+1);
         $('#score').text(current_score[i]);//here we add the current route length
         i+=1;
@@ -227,8 +234,6 @@ function addEncodedPaths() {
     for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
         path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
         paths = paths.concat(path);
-        //path += path;
-        //console.log(i, paths);
     }
 
     polyline = new google.maps.Polyline({
@@ -238,7 +243,41 @@ function addEncodedPaths() {
         strokeWeight: 2
     });
     polyline.setMap( map );
-    //console.log(polyline);
+}
+
+function drawNeighborRoad(){
+    var path;
+    var i=0;
+    var drawFunction;
+    //$("#stop").disabled = true; //stop button messes up the nearest neighbor
+    drawFunction = setInterval(function () {
+        path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
+
+        linePath = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#0000FF',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        linePath.setMap(map);
+        neighborPaths.push(linePath);
+        i+=1;
+        if (i>polyline_best_tour.length-2){
+            clearInterval(drawFunction);
+           //close the loop
+            path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);         
+            linePath = new google.maps.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: '#0000FF',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+            linePath.setMap(map);
+            neighborPaths.push(linePath);
+        }
+    }, 100);
 }
 
 function clear() {
@@ -247,12 +286,14 @@ function clear() {
     $('#score').empty();
     $('#route').empty();
     linePath.setMap( null );//remove best route from map(as the crow flies)
-    console.log(linePath);
     if (polyline){
-      polyline.setMap( null );//remove best route from map(Road distance)
+      polyline.setMap( null );//remove best route from map(road distance)
     }
     for (var i=0; i<linePaths.length; i++){
         linePaths[i].setMap(null);//remove the individual legs from map(Nearest Neighbor)
+    }
+    for (var j=0; j<neighborPaths.length; j++){
+        neighborPaths[j].setMap(null);//remove the individual legs from map(Nearest Neighbor, Road)
     }
 }
 
@@ -299,7 +340,7 @@ function handleFormSubmit(evt) {
             iterations = data.iterations;
             best_score = -data.best_score.toFixed(0);
             tour_cities = data.tour_cities;
-            for (var k=0; k < tour_cities.length; k++){              
+            for (var k=0; k < tour_cities.length; k++){            
                 cities_string += tour_cities[k] + ', ';
             }
             current_score = data.current_score;
@@ -307,12 +348,20 @@ function handleFormSubmit(evt) {
                 current_score[j] = -current_score[j].toFixed(0);
             }
             polyline_best_tour = data.poly_list;
-
+            var poly_animation_steps = data.poly_animation_steps;
 
             //Draw on our map
             // $('#plot').attr("src", data.img_file);
             if($('#algorithm').val() == 'nearest'){
+              if($('#mode').val() == 'as_the_crow_flies'){
                 drawNearestNeighbor(tour_coords);
+              }
+              else if($('#mode').val() == 'roads'){
+                drawNeighborRoad();                 
+              }
+              else{
+                console.log('error');
+              }
             }
             else
             {
@@ -320,7 +369,8 @@ function handleFormSubmit(evt) {
                 drawAnimation(animation_coords);
               }
               else if($('#mode').val() == 'roads'){
-                addEncodedPaths();
+                //addEncodedPaths();
+                drawAnimation(poly_animation_steps);
               }
               else{
                 console.log('error');

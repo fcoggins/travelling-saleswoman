@@ -43,10 +43,11 @@ def get_parameters():
     #The distance matrix is of the form {(i, j): dist, ... (i,j): dist} where i and
     #j are between 0 and the number of nodes. In the 48 cities data the city_id is
     #from one to the number of nodes(inclusive) 1 - 48 and the relationship is city_id = i + 1.
+    #Determine which matrix to use
     if mode == "as_the_crow_flies":
         matrix = tsp.distance_matrix(coords)
     elif mode == "roads":
-        matrix = tsp.road_matrix() 
+        matrix = tsp.road_matrix()
     else:
         return "Error"
 
@@ -102,14 +103,17 @@ def get_parameters():
 
     #return results as JSON
     tour_cities = convert_tour_to_city(best)
+
     if mode == "roads":
         poly_list = poly_line_tour(best)
+        poly_animation_steps = polyline_animation_steps(animation_steps)
     else:
         poly_list = []
+        poly_animation_steps = []
 
     results = {"iterations" : num_evaluations, "best_score" : best_score, "route" : best,
      "tour_coords": tour_coords, "tour_cities": tour_cities, "animation_coords": animation_coords, 
-     "current_score": current_score, "poly_list": poly_list}
+     "current_score": current_score, "poly_list": poly_list, "poly_animation_steps": poly_animation_steps}
     data = json.dumps(results)
     return data
 
@@ -125,21 +129,33 @@ def poly_line_tour(best):
     which is a list of polylines [line1, line2 .... linex] for 48 cities best
     includes each of the nodes from 0 to 47 once.'''
 
-    print best
     poly_list = []
     for i in range(len(best)):
         city1 = best[i]+1
         city2 = best[(i+1)%len(best)]+1
 
         distance = model.session.query(model.Distance).filter_by(city1_id = city1).filter_by(city2_id = city2).first()
-        #dist_object = model.session.query(model.Distance).filter_by(city1_id=i,city2_id=j).first()
 
         polyline = distance.polyline
         poly_list.append(polyline)
 
-    #We need to build our polylist and put into database
-    print poly_list
     return poly_list
+
+def polyline_animation_steps(animation_steps):
+    '''Converts animation steps (list of nodes) to polylines. Each polyline is a list of polyline segments.
+
+    input: List of lists of nodes
+    returns: List of lists of polylines
+    '''
+
+    poly_animation_steps = []
+    for i in range(len(animation_steps)):
+        line = poly_line_tour(animation_steps[i])
+        poly_animation_steps.append(line)
+
+    return poly_animation_steps
+
+
 
 
 if __name__ == "__main__":
