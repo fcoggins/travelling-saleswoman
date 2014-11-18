@@ -203,7 +203,8 @@ function drawAnimation(animation_coords){
       }
       else
       {
-        console.log(animation_coords[i]);
+        //console.log(animation_coords[i]);
+        addEncodedPaths(animation_coords[i]);
       }
         $('#number').text(i+1);
         $('#score').text(current_score[i]);//here we add the current route length
@@ -228,11 +229,14 @@ function addMarker() {
 
 //draw actual road paths
 
-function addEncodedPaths() {
+function addEncodedPaths(tour) {
     var path;
     var paths=[];
-    for( var i = 0, n = polyline_best_tour.length;  i < n;  i++ ) {
-        path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
+    if (polyline){
+      polyline.setMap( null );
+    }
+    for( var i = 0, n = tour.length;  i < n;  i++ ) {
+        path=google.maps.geometry.encoding.decodePath(tour[i]);
         paths = paths.concat(path);
     }
 
@@ -369,7 +373,7 @@ function handleFormSubmit(evt) {
                 drawAnimation(animation_coords);
               }
               else if($('#mode').val() == 'roads'){
-                //addEncodedPaths();
+                //addEncodedPaths(polyline_best_tour);
                 drawAnimation(poly_animation_steps);
               }
               else{
