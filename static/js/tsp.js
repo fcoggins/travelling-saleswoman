@@ -8,83 +8,71 @@ var linePath, iterations, best_score, tour_cities, tour_coords, current_score, p
 var drawAnimationFunction;
 var polyline;
 var linePaths = [];
-var neighborPaths = []
+var neighborPaths = [];
 var cities_string = "";
 
 google.maps.event.addDomListener(window, 'load', initialize);
 get_cities_list(); //populate the cities dropdown 
-$("#userinput").on("submit", handleFormSubmit);
+window.setTimeout(show_intro(), 100);
+$("#continue").on("click", begin);
 $("#drop").on("click", get_cities_data);
+$("#userinput").on("submit", handleFormSubmit);
 $("#clear").on("click", clear);
 $("#stop").on("click", stop);
 
+
+function show_intro(){
+  $("#intro").show();
+}
+
+function begin(){
+  $("#intro").hide();
+  $("#cities").show();
+}
+
+function get_cities_data(evt){
+    $.ajax({
+          type: 'GET',
+          url: "/get_cities_data",
+          dataType: 'json',
+          success: function(data) {
+            for (i=0; i< data.length; i++){
+                cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
+            }
+            drop();
+            $("#cities").hide();
+            $("#input").show();
+          }
+        });
+}
+
+function drop() {
+  for (var i = 0; i < cities.length; i++) {
+    setTimeout(function() {
+      addMarker();
+    }, i * 10);
+  }
+}
 
 
 function initialize(){
     // Create an array of styles.
     var styles = [
-  //   {
-  //   "featureType": "administrative.province",
-  //   "elementType": "geometry.stroke",
-  //   "stylers": [
-  //     { "color": "#bdd4de" }
-  //   ]
-  // },{
-  //   "featureType": "landscape.natural",
-  //   "stylers": [
-  //     { "color": "#2b3a42" }
-  //   ]
-  // },{
-  //   "featureType": "water",
-  //   "stylers": [
-  //     { "visibility": "on" },
-  //     { "color": "#3f5765" }
-  //   ]
-  // },{
-  //   "featureType": "landscape.natural.terrain",
-  //   "elementType": "geometry.stroke",
-  //   "stylers": [
-  //     { "visibility": "on" },
-  //     { "color": "#808080" }
-  //   ]
-  // },
-       {
-         featureType: "administrative",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "poi",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "water",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "road",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-        featureType: "road",
-        stylers: [
-            { visibility: "off" }
-    ]
-  }
-  // ,{
-  //   "featureType": "landscape.natural.terrain",
-  //   "stylers": [
-  //     { "visibility": "off" }
-  //   ]
-  // }
+        {"elementType":"labels","stylers":[{ "visibility": "off" }]},
+        {"stylers":[{"saturation":-100},{"gamma":1}]},
+        {"elementType":"labels.text.stroke","stylers":[{"visibility":"off"}]},
+        {"featureType":"poi.business","elementType":"labels.text","stylers":[{"visibility":"off"}]},
+        {"featureType":"poi.business","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+        {"featureType":"poi.place_of_worship","elementType":"labels.text","stylers":[{"visibility":"off"}]},
+        {"featureType":"poi.place_of_worship","elementType":"labels.icon","stylers":[{"visibility":"off"}]},
+        {"featureType":"road","elementType":"geometry","stylers":[{"visibility":"simplified"}]},
+        {"featureType":"water","stylers":[{"visibility":"on"},{"saturation":50},{"gamma":0},{"hue":"#50a5d1"}]},
+        {"featureType":"administrative.neighborhood","elementType":"labels.text.fill","stylers":[{"color":"#333333"}]},
+        {"featureType":"road.local","elementType":"labels.text","stylers":[{"weight":0.5},{"color":"#333333"}]},
+        {"featureType":"transit.station","elementType":"labels.icon","stylers":[{"gamma":1},{"saturation":50}]}
      ];
+
+
 
     // Create a new StyledMapType object, passing it the array of styles,
     // as well as the name to be displayed on the map type control.
@@ -94,9 +82,8 @@ function initialize(){
     // Create a map object, and include the MapTypeId to add
     // to the map type control.
             var mapOptions = {
-                center: { lat: 38.5, lng: -96},
+                center: { lat: 39, lng: -90},
                 zoom: 5,
-                //mapTypeId: google.maps.MapTypeId.TERRAIN,
                 disableDefaultUI: true,
                 draggable: false,
                 zoomControl: false,
@@ -114,10 +101,6 @@ function initialize(){
     //Associate the styled map with the MapTypeId and set it to display.
     map.mapTypes.set('map_style', styledMap);
     map.setMapTypeId('map_style');
-
-    //Draw a line on the map. Design decision to draw using google LatLng function
-    //but can get this from the database later if needed
-
     }
 
 
@@ -139,7 +122,7 @@ function drawLine(tour_coords){
     linePath = new google.maps.Polyline({
             path: lineCoordinates,
             geodesic: true,
-            strokeColor: '#FF0000',
+            strokeColor: '#ec571d',
             strokeOpacity: 1.0,
             strokeWeight: 2
         });
@@ -166,9 +149,9 @@ function drawNearestNeighbor(tour_coords){
         linePath = new google.maps.Polyline({
             path: lineCoordinates,
             geodesic: true,
-            strokeColor: '#FF0000',
+            strokeColor: '#ec571d',
             strokeOpacity: 1.0,
-            strokeWeight: 2
+            strokeWeight: 3
         });
         linePath.setMap(map);
         linePaths.push(linePath);
@@ -185,12 +168,14 @@ function drawNearestNeighbor(tour_coords){
             linePath = new google.maps.Polyline({
                 path: lineCoordinates,
                 geodesic: true,
-                strokeColor: '#FF0000',
+                strokeColor: '#ec571d',
                 strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeWeight: 3
             });
             linePath.setMap(map);
             linePaths.push(linePath);
+            $('#score').text("Add tour length");//here we add the current route length
+            $('#route').text(cities_string);//write the route here
         }
     }, 100);
 }
@@ -203,7 +188,6 @@ function drawAnimation(animation_coords){
       }
       else
       {
-        //console.log(animation_coords[i]);
         addEncodedPaths(animation_coords[i]);
       }
         $('#number').text(i+1);
@@ -242,7 +226,7 @@ function addEncodedPaths(tour) {
 
     polyline = new google.maps.Polyline({
         path: paths,
-        strokeColor: "#0000FF",
+        strokeColor: "#2f575d",
         strokeOpacity: 1.0,
         strokeWeight: 2
     });
@@ -260,9 +244,9 @@ function drawNeighborRoad(){
         linePath = new google.maps.Polyline({
             path: path,
             geodesic: true,
-            strokeColor: '#0000FF',
+            strokeColor: '#2f575d',
             strokeOpacity: 1.0,
-            strokeWeight: 2
+            strokeWeight: 3
         });
         linePath.setMap(map);
         neighborPaths.push(linePath);
@@ -274,13 +258,15 @@ function drawNeighborRoad(){
             linePath = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
-                strokeColor: '#0000FF',
+                strokeColor: '#2f575d',
                 strokeOpacity: 1.0,
-                strokeWeight: 2
+                strokeWeight: 3
             });
             linePath.setMap(map);
             neighborPaths.push(linePath);
         }
+    $('#score').text('Add current score here');//here we add the current route length
+    $('#route').text(cities_string);//write the route here
     }, 100);
 }
 
@@ -289,6 +275,11 @@ function clear() {
     $('#number').empty();
     $('#score').empty();
     $('#route').empty();
+    iterations = 0;
+    best_score = 0;
+    cities_string = '';
+    tour_coords = null;
+    polyline_best_tour = null;
     linePath.setMap( null );//remove best route from map(as the crow flies)
     if (polyline){
       polyline.setMap( null );//remove best route from map(road distance)
@@ -299,22 +290,22 @@ function clear() {
     for (var j=0; j<neighborPaths.length; j++){
         neighborPaths[j].setMap(null);//remove the individual legs from map(Nearest Neighbor, Road)
     }
+
 }
 
 function stop() {
     clearInterval(drawAnimationFunction);
-    drawLine(tour_coords);
+    if(tour_coords && $('#mode').val() == 'as_the_crow_flies'){
+      drawLine(tour_coords);
+    }
+
+    if(polyline_best_tour && $('#mode').val() == 'roads'){
+      addEncodedPaths(polyline_best_tour);
+    }
+
     $('#number').text(iterations);
     $('#score').text(best_score);
     $('#route').text(cities_string);
-}
-
-function drop() {
-  for (var i = 0; i < cities.length; i++) {
-    setTimeout(function() {
-      addMarker();
-    }, i * 10);
-  }
 }
 
 
@@ -336,6 +327,7 @@ function handleFormSubmit(evt) {
                     linePaths[i].setMap(null);
                 }
             clear();
+            $('#results').show();
 
             //import our data
             var image = data.img_file;
@@ -373,7 +365,6 @@ function handleFormSubmit(evt) {
                 drawAnimation(animation_coords);
               }
               else if($('#mode').val() == 'roads'){
-                //addEncodedPaths(polyline_best_tour);
                 drawAnimation(poly_animation_steps);
               }
               else{
@@ -383,20 +374,7 @@ function handleFormSubmit(evt) {
       }
 });
 }
-
-function get_cities_data(evt){
-    $.ajax({
-          type: 'GET',
-          url: "/get_cities_data",
-          dataType: 'json',
-          success: function(data) {
-            for (i=0; i< data.length; i++){
-                cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
-            }
-            drop();
-          }
-        });
-}
+});
 
 //populate the cities drop down list in the form
 function get_cities_list(){
@@ -413,11 +391,5 @@ function get_cities_list(){
         }
     });
 }
-
-
-});
-
-
-
 
 

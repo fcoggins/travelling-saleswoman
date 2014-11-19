@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="static/dist/css/bootstrap.min.css">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="static/dist/css/bootstrap-theme.min.css">
+    <!--<link rel="stylesheet" href="static/dist/css/bootstrap-theme.min.css">-->
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -16,10 +16,6 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
-    <style type="text/css">
-      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
-      .map { width: 100%; border: 1px solid black;}
-    </style>    
 </head>
 <body>
     <!-- Fixed navbar -->
@@ -32,7 +28,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">The Travelling Salesman</a>
+          <a class="navbar-brand" href="#">the travelling SalesLady</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -55,17 +51,34 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-    <div class="jumbotron">
-        <div id="panel" style="margin-left: 50px">
-          <button id="drop">Drop Markers</button>
-         </div>
+    <!--<div class="jumbotron">-->
         <div id="map-canvas" class="map"></div>
-    </div>
+    <!--</div>-->
 
+          <div class="panel panel-primary intro" id="intro">
+            <div class="panel-heading">
+              <h3 class="panel-title">The Problem</h3>
+            </div>
+            <div class="panel-body">
+              <p>How can you most economically travel a route between a number of cities, such that you visit each city exactly one time?</p>
+              <p>Though there is no exact mathematical solution for this problem, 
+                there are many algorithms that give acceptable results. Explore some 
+                of those solutions through this tool.
+             <button id="continue">Continue</button> 
+            </div>
+        </div>
 
+         <div class="panel panel-primary cities" id="cities">
+            <div class="panel-heading">
+              <h3 class="panel-title">Cities on the Tour</h3>
+            </div>
+            <div class="panel-body">
+              <p>Option to select specific cities will be implemented here.</p>
+             <button id="drop">Select</button> 
+            </div>
+        </div>
 
-
-        <div class="panel panel-default user_input">
+        <div class="panel panel-primary user_input" id="input">
             <div class="panel-heading">
               <h3 class="panel-title">Input</h3>
             </div>
@@ -127,7 +140,7 @@
 
 
 
-        <div class="panel panel-default results">
+        <div class="panel panel-primary results" id="results">
             <div class="panel-heading">
               <h3 class="panel-title">Results</h3>
             </div>
@@ -146,8 +159,11 @@
     </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="dist/js/bootstrap.min.js"></script>
-<script src="/static/js/gmapi.js"></script>
+<script src="static/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZIoOX8afLsDVhpqC788YraO1ApQLwwcg">
+</script>
+<!--<script src="/static/js/gmapi.js"></script>-->
 <script src="/static/js/tsp.js"></script>
 </body>
 </html>

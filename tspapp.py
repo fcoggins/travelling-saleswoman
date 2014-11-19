@@ -117,6 +117,8 @@ def get_parameters():
     data = json.dumps(results)
     return data
 
+    
+
 def convert_tour_to_city(best):
     nodes = model.session.query(model.City).all()
     city_list = []
