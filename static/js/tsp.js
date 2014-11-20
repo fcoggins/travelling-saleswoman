@@ -226,13 +226,15 @@ function drawNearestNeighbor(tour_coords){
             });
             linePath.setMap(map);
             linePaths.push(linePath);
-            $('#score').text(best_score);//here we add the current route length
+            $('.iterations').hide();
+            $('#score').text(-best_score);//here we add the current route length
             $('#route').text(cities_string);//write the route here
         }
     }, 100);
 }
 
 function drawAnimation(animation_coords){
+    $('.iterations').show();
     var i=0;
     drawAnimationFunction = setInterval(function () {
       if($("#mode").val() == 'as_the_crow_flies'){
@@ -306,7 +308,7 @@ function drawNeighborRoad(){
         if (i>polyline_best_tour.length-2){
             clearInterval(drawFunction);
            //close the loop
-            path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);         
+            path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);  
             linePath = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
@@ -317,7 +319,8 @@ function drawNeighborRoad(){
             linePath.setMap(map);
             neighborPaths.push(linePath);
         }
-    $('#score').text(best_score);//here we add the current route length
+    $('.iterations').hide();
+    $('#score').text(-best_score);//here we add the current route length
     $('#route').text(cities_string);//write the route here
     }, 100);
 }
@@ -354,13 +357,14 @@ function stop() {
     if(polyline_best_tour && $('#mode').val() == 'roads'){
       addEncodedPaths(polyline_best_tour);
     }
-
+    $('.iterations').show();
     $('#number').text(iterations);
     $('#score').text(best_score);
     $('#route').text(cities_string);
 }
 
 function resetMyForm(){
+    $('.results').hide();
     $('#userinput')[0].reset();
     $(".nearest_neighbor").hide();
     $(".hill_anneal").hide();
@@ -404,7 +408,7 @@ function handleFormSubmit(evt) {
             iterations = data.iterations;
             best_score = -data.best_score.toFixed(0);
             tour_cities = data.tour_cities;
-            for (var k=0; k < tour_cities.length; k++){            
+            for (var k=0; k < tour_cities.length; k++){         
                 cities_string += tour_cities[k] + ', ';
             }
             current_score = data.current_score;
