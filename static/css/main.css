@@ -11,7 +11,7 @@ html, body { height: 100%; margin: 0; padding: 0;}
        left: 82%;
        z-index: 500;
        opacity: 0.7;
-       width: 250px;
+       width: 300px;
        display: none;
 }
 
@@ -29,6 +29,10 @@ html, body { height: 100%; margin: 0; padding: 0;}
 
 .results{
        top: 500px;
+}
+
+.mode_class, .nearest_neighbor, .hill_anneal, .anneal, .stop_clear, #next_algorithm, #submitbutton{
+  display: none;
 }
 
 img {

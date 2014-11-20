@@ -19,6 +19,60 @@ $("#drop").on("click", get_cities_data);
 $("#userinput").on("submit", handleFormSubmit);
 $("#clear").on("click", clear);
 $("#stop").on("click", stop);
+$("#next").on("click", resetMyForm);
+$("#select_algorithm").on("click", function(evt){
+  evt.preventDefault();
+  var algorithm = $('#algorithm').val();
+  $("#select_algorithm").hide();
+  if (algorithm == 'nearest'){
+    $(".nearest_neighbor").show();
+    $(".hill_anneal").hide();
+    $(".anneal").hide();
+    $(".mode_class").show();
+    $("#submitbutton").show();
+    $(".stop_clear").show();
+    $("#next_algorithm").show();
+    $("label[for='algorithm']").hide();
+    $("#algorithm").hide();
+    $(".mode_class").prepend('<h4>Algorithm: Nearest Neighbor</h4>');
+    $("#stop").hide();
+  }
+  else if (algorithm == 'hillclimb' || algorithm == 'hill_restart') {
+    $(".nearest_neighbor").hide();
+    $(".anneal").hide();
+    $(".mode_class").show();
+    $(".hill_anneal").show();
+    $("#submitbutton").show();
+    $(".stop_clear").show();
+    $("#next_algorithm").show();
+    $("label[for='algorithm']").hide();
+    $("#algorithm").hide();
+    $("#stop").show();
+    if (algorithm == 'hillclimb'){
+      $(".mode_class").prepend('<h4>Algorithm: Hillclimb</h4>');
+      }
+      else
+      {
+      $(".mode_class").prepend('<h4>Algorithm: Hillclimb & Restart</h4>'); 
+      }
+    }
+  else if (algorithm == 'annealing'){
+    $(".nearest_neighbor").hide();
+    $(".hill_anneal").show();
+    $(".mode_class").show();
+    $(".anneal").show();
+    $("#submitbutton").show();
+    $(".stop_clear").show();
+    $("#next_algorithm").show();
+    $("label[for='algorithm']").hide();
+    $("#algorithm").hide();
+    $("#stop").show();
+    $(".mode_class").prepend('<h4>Algorithm: Simulated Annealing</h4>');
+  }
+  else{
+    console.log('error in algorithm selection');
+  }
+});
 
 
 function show_intro(){
@@ -53,7 +107,6 @@ function drop() {
     }, i * 10);
   }
 }
-
 
 function initialize(){
     // Create an array of styles.
@@ -137,7 +190,6 @@ function drawNearestNeighbor(tour_coords){
     var i=0;
     linePaths = [];
     var drawFunction;
-    //$("#stop").disabled = true; //stop button messes up the nearest neighbor
     drawFunction = setInterval(function () {
         j = i + 1;
         lat1 = tour_coords[i][0];
@@ -174,7 +226,7 @@ function drawNearestNeighbor(tour_coords){
             });
             linePath.setMap(map);
             linePaths.push(linePath);
-            $('#score').text("Add tour length");//here we add the current route length
+            $('#score').text(best_score);//here we add the current route length
             $('#route').text(cities_string);//write the route here
         }
     }, 100);
@@ -265,7 +317,7 @@ function drawNeighborRoad(){
             linePath.setMap(map);
             neighborPaths.push(linePath);
         }
-    $('#score').text('Add current score here');//here we add the current route length
+    $('#score').text(best_score);//here we add the current route length
     $('#route').text(cities_string);//write the route here
     }, 100);
 }
@@ -306,6 +358,22 @@ function stop() {
     $('#number').text(iterations);
     $('#score').text(best_score);
     $('#route').text(cities_string);
+}
+
+function resetMyForm(){
+    $('#userinput')[0].reset();
+    $(".nearest_neighbor").hide();
+    $(".hill_anneal").hide();
+    $(".anneal").hide();
+    $("#submitbutton").hide();
+    $(".stop_clear").hide();
+    $("#select_algorithm").show();
+    $(".mode_class").hide();
+    $("#next_algorithm").hide();
+    $("label[for='algorithm']").show();
+    $("#algorithm").show();
+    $(".mode_class > h4").remove();
+    clear();
 }
 
 
