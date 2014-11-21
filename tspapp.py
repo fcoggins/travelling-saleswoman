@@ -12,12 +12,30 @@ def index():
     """Return the index page"""  
     return render_template("index2.html")
 
-@app.route("/get_cities_data", methods=['GET'])
+
+@app.route("/get_initial_data", methods=['GET'])
+def get_initial_data():
+    '''returns a list of all available cities to populate the dropdown'''
+
+    nodes = model.session.query(model.City).all()
+    city_list = []
+    for i in range(len(nodes)):
+        city_list.append({'city': nodes[i].city})
+    return json.dumps(city_list)
+
+
+
+@app.route("/get_cities_data", methods=['POST'])
 def get_cities_data():
     """returns list of cities + lat long as json, like:
     [ ("Annapolis", 34, 5), ("Austin", 2, 4)]
     """
-    nodes = model.session.query(model.City).all()
+    print "in get cities data"
+    cities = request.form.getlist('city_group')
+    nodes = []
+    for city in cities:
+        node = model.session.query(model.City).filter_by(id = int(city)+1).one()
+        nodes.append(node)
     city_list = []
     for i in range(len(nodes)):
         city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude})
@@ -25,7 +43,6 @@ def get_cities_data():
 
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
-    
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
     start_temp = float(request.form['start_temp'])
@@ -33,12 +50,19 @@ def get_parameters():
     move_operator = request.form['move_operator']
     start_city = int(request.form['start'])
     mode = request.form['mode']
+    selected_cities = request.form['selected_cities']
+    selected_cities_list = selected_cities.split(',')
+    print selected_cities_list
+
 
     current_score=[] #initialize here so that I don't get an error
     animation_coords = []
+    nodes2 = []
 
     nodes = model.session.query(model.City).all()
-    coords = tsp.read_coords_db(nodes)
+    for acity in selected_cities_list:
+        nodes2.append(model.session.query(model.City).filter_by(city = acity).one())
+    coords = tsp.read_coords_db(nodes2)
 
     #The distance matrix is of the form {(i, j): dist, ... (i,j): dist} where i and
     #j are between 0 and the number of nodes. In the 48 cities data the city_id is
@@ -47,7 +71,8 @@ def get_parameters():
     if mode == "as_the_crow_flies":
         matrix = tsp.distance_matrix(coords)
     elif mode == "roads":
-        matrix = tsp.road_matrix()
+        # matrix = tsp.road_matrix()
+        matrix = tsp.road_matrix2(coords)
     else:
         return "Error"
 
@@ -117,7 +142,7 @@ def get_parameters():
     data = json.dumps(results)
     return data
 
-    
+
 
 def convert_tour_to_city(best):
     nodes = model.session.query(model.City).all()

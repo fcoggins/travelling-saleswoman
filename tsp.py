@@ -84,6 +84,31 @@ def road_matrix():
     #print_nice_matrix(matrix)
     return matrix
 
+def road_matrix2(coords):
+#     '''This will pull data from our database table of 48 us cities into a matrix 
+#     to be used for tour length calculations. It will look like {(city1_id, city2_id):
+#     distance, (cityn_id, citym_id): distance, ...}.'''
+
+    matrix = {}
+
+
+# since this is a symetric problem we only have to calculate the matrix from i to j
+# and not from j to i. However, tour length only looks for the tuple which is the key
+# in on direction so we may have to build the second half of the matrix.
+
+    for i in range(len(coords)):
+        city1 = i + 1
+        matrix[(i, i)] = 0
+        for j in range(i+1, len(coords)):           
+            city2 = j + 1
+            miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
+                filter(model.Distance.city2_id == city2).first()
+            #print i, j, miles.miles
+            matrix[(i, j)] = miles.road_miles
+            matrix[(j, i)] = matrix[(i, j)]
+    #print_nice_matrix(matrix)
+    return matrix
+
 def print_nice_matrix(matrix):
     '''Print a nice distance matrix that is readable by humans. Used for debugging'''
 
@@ -202,6 +227,7 @@ def drawtour_on_map(coords, tour):
     a tour segment.
     '''
     num_cities = len(tour)
+    print num_cities
     list_of_tour_segments = []
 
     for i in range(num_cities):
