@@ -36,16 +36,33 @@ def read_coords_db(cities):
 #             matrix[i,j]=dist
 #     return matrix
 
-def distance_matrix(coords):
-    ''' Output a dictionary of the distance between all pairs of cities. As above
-    but we have the option of using our own functions to calculate the distance
+def distance_matrix2(coords, id_list):
+    ''' Output a dictionary of the distance between chosen pairs of cities.
     '''
     matrix = {}
-
-    for i,(lat1,lon1) in enumerate(coords):
-        for j,(lat2,lon2) in enumerate(coords): 
-            matrix[i,j]=distance_between_two_cities(lat1, lon1, lat2, lon2)
+    # print coords
+    for i in range(len(coords)):
+        city1 = id_list[i]
+        matrix[city1, city1]=0
+        for j in range(len(coords)):           
+            city2 = id_list[j]
+            lat1, lon1, lat2, lon2 = coords[i][0], coords[i][1], coords[j][0], coords[j][1] 
+            matrix[city1, city2]=distance_between_two_cities(lat1, lon1, lat2, lon2)
+            matrix[city2, city1]=matrix[city1, city2]
+        
     return matrix
+
+# def distance_matrix(coords):
+#     ''' Output a dictionary of the distance between all pairs of cities. As above
+#     but we have the option of using our own functions to calculate the distance
+#     '''
+#     matrix = {}
+#     print coords
+#     print enumerate(coords)
+#     for i,(lat1,lon1) in enumerate(coords):
+#         for j,(lat2,lon2) in enumerate(coords): 
+#             matrix[i,j]=distance_between_two_cities(lat1, lon1, lat2, lon2)
+#     return matrix
 
 def distance_between_two_cities(lat1, lon1, lat2, lon2):
     '''Calculates distance between two points using the spherical law of cosines.
@@ -59,9 +76,9 @@ def distance_between_two_cities(lat1, lon1, lat2, lon2):
     return dist
 
 def road_matrix():
-#     '''This will pull data from our database table of 48 us cities into a matrix 
-#     to be used for tour length calculations. It will look like {(city1_id, city2_id):
-#     distance, (cityn_id, citym_id): distance, ...}.'''
+    '''This will pull data from our database table of 48 us cities into a matrix 
+    to be used for tour length calculations. It will look like {(city1_id, city2_id):
+    distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
 
@@ -84,28 +101,29 @@ def road_matrix():
     #print_nice_matrix(matrix)
     return matrix
 
-def road_matrix2(coords):
+def road_matrix2(coords, id_list):
 #     '''This will pull data from our database table of 48 us cities into a matrix 
 #     to be used for tour length calculations. It will look like {(city1_id, city2_id):
 #     distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
+    # print id_list, "id list"
 
 
 # since this is a symetric problem we only have to calculate the matrix from i to j
 # and not from j to i. However, tour length only looks for the tuple which is the key
 # in on direction so we may have to build the second half of the matrix.
 
-    for i in range(len(coords)):
-        city1 = i + 1
-        matrix[(i, i)] = 0
-        for j in range(i+1, len(coords)):           
-            city2 = j + 1
+    for i in range(len(id_list)):
+        city1 = id_list[i]
+        matrix[city1, city1] = 0
+        for j in range(i+1, len(id_list)):           
+            city2 = id_list[j]
             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
                 filter(model.Distance.city2_id == city2).first()
             #print i, j, miles.miles
-            matrix[(i, j)] = miles.road_miles
-            matrix[(j, i)] = matrix[(i, j)]
+            matrix[city1, city2] = miles.road_miles
+            matrix[city2, city1] = matrix[city1, city2]
     #print_nice_matrix(matrix)
     return matrix
 
@@ -137,6 +155,8 @@ def tour_length(matrix,tour):
 	Input a distance matrix and the list of cities as integers. Output the
 	tour length as a float.
     '''
+    # print "in tour_length", matrix
+    # print tour
     total=0
     num_cities=len(tour)
     for i in range(num_cities):
@@ -222,23 +242,36 @@ def reversed_sections(tour):
 #     del d
 #     img.save(img_file, "PNG")
 
-def drawtour_on_map(coords, tour):
+# def drawtour_on_map(coords, tour):
+#     '''return a list of tuples to use in drawing on map. Each tuple represents
+#     a tour segment.
+#     '''
+#     num_cities = len(tour)
+#     print num_cities
+#     list_of_tour_segments = []
+
+#     for i in range(num_cities):
+#         city_i=tour[i]
+#         list_of_tour_segments.append(coords[city_i])
+#     return list_of_tour_segments
+
+def drawtour_on_map2(coord_dict, tour):
     '''return a list of tuples to use in drawing on map. Each tuple represents
     a tour segment.
     '''
-    num_cities = len(tour)
-    print num_cities
+    # print tour
+    # print coord_dict, "coord_dict"
     list_of_tour_segments = []
-
-    for i in range(num_cities):
-        city_i=tour[i]
-        list_of_tour_segments.append(coords[city_i])
+    # print tour, "tour"
+    for city in tour:
+        # print city, "city"
+        list_of_tour_segments.append(coord_dict[city])
+        # print list_of_tour_segments, "list of tour segments"
     return list_of_tour_segments
 
 
-def init_random_tour(tour_length):
-    '''Takes tour length as an arguement and returns a random tour'''
-    tour=range(tour_length)
+def init_random_tour(tour):
+    '''Takes selected tour as an arguement and returns a random tour'''
     random.shuffle(tour)
     return tour
 
@@ -255,8 +288,8 @@ def hillclimb(
     best_score=objective_function(best)
     
     num_evaluations=1
-    animation_steps = [] #keep track of intermediate tour routes
-    current_score = [] #keep track of intermediate scores
+    animation_steps = [best] #keep track of intermediate tour routes
+    current_score = [best_score] #keep track of intermediate scores
     
     while num_evaluations < max_evaluations:
         # If we append here we will show the total animation steps (minus last one
@@ -324,17 +357,21 @@ def hillclimb_and_restart(
 
 #Nearest Neighbor algorithm
 def greedy(dist, start_city):
-
+    # print dist, "dist"
+    # print start_city, "start_city"
     '''solve using the greedy algorithm.'''
-    n = int(math.sqrt(len(dist)))
-
+    city_tuples=dist.keys()
+    unvisited_cities_list = []
+    for item in city_tuples:
+        unvisited_cities_list+=(list(item))
+    unvisited_cities = set(unvisited_cities_list)
     current_city = start_city
-    unvisited_cities = set(range(0, n))
     unvisited_cities.remove(current_city)#remove current city from the set of unvisited cities
     solution = [current_city]
 
     def distance_from_current_city(to):
-        return dist[current_city, to]
+        # print current_city, to
+        return dist[(current_city, to)]
 
     while unvisited_cities:
 
@@ -343,6 +380,7 @@ def greedy(dist, start_city):
         solution.append(next_city)
         current_city = next_city
     length = tour_length(dist, solution)
+    # print "length", length, "solution", solution
     return (None, length, solution)
 
 
@@ -409,7 +447,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     
     cooling_schedule=kirkpatrick_cooling(start_temp,alpha)
 
-    print 'anneal started: score=%f'%current_score
+    # print 'anneal started: score=%f'%current_score
     
     for temperature in cooling_schedule:
         done = False

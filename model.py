@@ -26,9 +26,9 @@ class City(Base):
 class Distance(Base):
     __tablename__ = "distance"
 
-    id = Column(Integer, primary_key = True)
-    city1_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
-    city2_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
+    id = Column(Integer, primary_key = True)#index=True
+    city1_id = Column(Integer, ForeignKey("cities.id"), nullable=False)#index=True
+    city2_id = Column(Integer, ForeignKey("cities.id"), nullable=False)#index=True
     miles = Column(Float)
     road_miles = Column(Float)
     polyline = Column(String(10000))

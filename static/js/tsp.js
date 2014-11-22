@@ -13,7 +13,6 @@ var selected_cities = [];
 var cities_string = "";
 
 google.maps.event.addDomListener(window, 'load', initialize);
-get_start_city(); //populate the cities for nearest neighbor
 window.setTimeout(show_intro(), 100);
 $("#continue").on("click", begin);
 $("#drop").on("click", handleCitiesForm);
@@ -104,7 +103,7 @@ function get_cities_data(evt){
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
-    console.log(i);
+    // console.log(i);
     setTimeout(function() {
       addMarker();
     }, i * 10);
@@ -258,7 +257,7 @@ function drawAnimation(animation_coords){
 }
 
 function addMarker() {
-          console.log('in addMarker')
+          // console.log('in addMarker')
           markers.push(new google.maps.Marker({
             position: cities[iterator],
             map: map,
@@ -386,8 +385,8 @@ function resetMyForm(){
 
 function handleCitiesForm(evt) {
   evt.preventDefault();
-  console.log('handleCitiesForm');
-  console.log($("#cityinput").serializeArray());
+  // console.log('handleCitiesForm');
+  // console.log($("#cityinput").serializeArray());
   $.ajax({
     type: "POST",
     url: "/get_cities_data",
@@ -396,10 +395,12 @@ function handleCitiesForm(evt) {
     success: function( data ) {
       for (i=0; i< data.length; i++){
                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
-                selected_cities.push(data[i].city);
+                selected_cities.push([data[i].id, data[i].city]);
+                // console.log("id", data[i].id);
             }
       drop();
-
+      // console.log("selected_cities", selected_cities);
+      get_start_city(selected_cities); //populate the cities for nearest neighbor
       $("#cities").hide();
       $("#input").show();
     }
@@ -408,10 +409,10 @@ function handleCitiesForm(evt) {
 
 function handleFormSubmit(evt) {
     evt.preventDefault();
-    console.log(selected_cities);
+    // console.log(selected_cities);
     var jsonText = $('#userinput').serialize();
     jsonText += "&selected_cities="+selected_cities;
-    console.log(jsonText);
+    // console.log(jsonText);
     $.ajax({
         type: "POST",
         url: "/userinput",
@@ -494,19 +495,27 @@ function get_cities_list(){
 }
 
 //select the start city from the group of selected cities
-function get_start_city(){
-    $.ajax({
-          type: 'GET',
-          url: "/get_initial_data",
-          dataType: 'json',
-          success: function(data) {
+// function get_start_city(){
+//     $.ajax({
+//           type: 'GET',
+//           url: "/get_initial_data",
+//           dataType: 'json',
+//           success: function(data) {
+//             text = "";
+//             for (i=0; i< data.length; i++){
+//                 text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
+//             }
+//             $('#start').html(text);
+//         }
+//     });
+// }
+
+function get_start_city(selected_cities){
             text = "";
-            for (i=0; i< data.length; i++){
-                text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
+            for (i=0; i< selected_cities.length; i++){
+                text +="<option value='"+ selected_cities[i][0] +"'>"+ selected_cities[i][1]+"</option>";
             }
             $('#start').html(text);
         }
-    });
-}
 
 
