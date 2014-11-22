@@ -338,6 +338,7 @@ def hillclimb_and_restart(
     best_score=0
     
     num_evaluations=0
+    animation_steps_total = []
     while num_evaluations < max_evaluations:
         remaining_evaluations=max_evaluations-num_evaluations
         
@@ -348,11 +349,21 @@ def hillclimb_and_restart(
             remaining_evaluations)
         
         num_evaluations+=evaluated
+        animation_steps_total+=animation_steps
+
         if score > best_score or best is None:
             best_score=score
             best=found
+        print "score =", score
+        print "current_score =", current_score
+        print "best_score=", best_score
+    animation_steps_total+=[best]
+    #best_score.append(best)
+    print best, "best"
+    print animation_steps, "steps"
+    print animation_steps_total, "total"
         
-    return (num_evaluations,best_score,best,animation_steps, current_score)
+    return (num_evaluations,best_score,best,animation_steps_total, current_score)
 
 
 #Nearest Neighbor algorithm
@@ -473,6 +484,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     best_score=objective_function.best_score #This is the final route (miles)
     best=objective_function.best #Nodes that make up the best route
     score_list=objective_function.score_list
+    objective_function.steps.append(best)
 
     #print 'final temperature: %f'%temperature
     #print num_evaluations, best_score
