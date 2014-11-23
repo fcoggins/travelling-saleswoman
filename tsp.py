@@ -1,14 +1,5 @@
 import math, random, logging, model
-from PIL import Image, ImageFont, ImageDraw
 
-# def read_coords(coord_file):
-#     '''Read coordinates from a text file. One x, y coordinate per line''' 
-#     coords=[]
-#     for line in coord_file:
-#         line=line.strip().split(' ')
-#         x, y = line[1], line[2]
-#         coords.append((float(x),float(y)))
-#     return coords
 
 def read_coords_db(cities):
     '''in which data passes from Flask / SQLAlchemy to be used in the 
@@ -19,22 +10,6 @@ def read_coords_db(cities):
         x, y = cities[i].lat, cities[i].longitude
         coords.append((float(x),float(y)))
     return coords
-    
-
-# def cartesian_matrix(coords):
-#     '''Create a distance matrix for the city coordsthat uses straight line 
-#     distance. Input a list of (x,y) tuples and output a dictionary of the 
-#     distance between all pairs of cities.
-#     ex. matrix[1][2] will output the distance between city 1 and city 2. all
-#     distances are in the matrix twice from a to b and from b to a.
-#     '''
-#     matrix={}
-#     for i,(x1,y1) in enumerate(coords):
-#         for j,(x2,y2) in enumerate(coords):
-#             dx,dy=x1-x2,y1-y2
-#             dist=math.sqrt(dx*dx + dy*dy)
-#             matrix[i,j]=dist
-#     return matrix
 
 def distance_matrix2(coords, id_list):
     ''' Output a dictionary of the distance between chosen pairs of cities.
@@ -51,18 +26,6 @@ def distance_matrix2(coords, id_list):
             matrix[city2, city1]=matrix[city1, city2]
         
     return matrix
-
-# def distance_matrix(coords):
-#     ''' Output a dictionary of the distance between all pairs of cities. As above
-#     but we have the option of using our own functions to calculate the distance
-#     '''
-#     matrix = {}
-#     print coords
-#     print enumerate(coords)
-#     for i,(lat1,lon1) in enumerate(coords):
-#         for j,(lat2,lon2) in enumerate(coords): 
-#             matrix[i,j]=distance_between_two_cities(lat1, lon1, lat2, lon2)
-#     return matrix
 
 def distance_between_two_cities(lat1, lon1, lat2, lon2):
     '''Calculates distance between two points using the spherical law of cosines.
@@ -84,10 +47,6 @@ def road_matrix():
 
     nodes = model.session.query(model.City).all()
 
-# since this is a symetric problem we only have to calculate the matrix from i to j
-# and not from j to i. However, tour length only looks for the tuple which is the key
-# in on direction so we may have to build the second half of the matrix.
-
     for i in range(len(nodes)):
         city1 = i + 1
         matrix[(i, i)] = 0
@@ -95,10 +54,8 @@ def road_matrix():
             city2 = j + 1
             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
                 filter(model.Distance.city2_id == city2).first()
-            #print i, j, miles.miles
             matrix[(i, j)] = miles.road_miles
             matrix[(j, i)] = matrix[(i, j)]
-    #print_nice_matrix(matrix)
     return matrix
 
 def road_matrix2(coords, id_list):
@@ -107,12 +64,6 @@ def road_matrix2(coords, id_list):
 #     distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
-    # print id_list, "id list"
-
-
-# since this is a symetric problem we only have to calculate the matrix from i to j
-# and not from j to i. However, tour length only looks for the tuple which is the key
-# in on direction so we may have to build the second half of the matrix.
 
     for i in range(len(id_list)):
         city1 = id_list[i]
@@ -137,26 +88,13 @@ def print_nice_matrix(matrix):
             city2 = j + 1
             print "Distance from %d to %d is %0.0f"%(city1, city2, matrix[(i, j)])
 
-# def look_up_distance(city1, city2):
-#     '''Look up the distance between any two cities from the database. This does 
-#     the look up one at a time and slows the program way down as opposed to having 
-#     the matrix in memory.'''
-
-#     #For our model, city id's are the indexed id's + 1
-#     city1 += 1
-#     city2 += 1
-#     #Look it up and return
-#     distances = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
-#         filter(model.Distance.city2_id == city2).one()
-#     return distances.miles
 
 def tour_length(matrix,tour):
     '''Calculate the length of any particular tour.
 	Input a distance matrix and the list of cities as integers. Output the
 	tour length as a float.
     '''
-    # print "in tour_length", matrix
-    # print tour
+
     total=0
     num_cities=len(tour)
     for i in range(num_cities):
@@ -205,68 +143,16 @@ def reversed_sections(tour):
             if copy != tour: # no point returning the same tour
                 yield copy
 
-# def write_tour_to_img(coords, tour, n, img_file):
-
-#     #scale coordinates by n
-#     coords=[(x*n,y*n) for (x,y) in coords]
-
-#     num_cities=len(tour)
-
-#     padding=20
-#     # shift all coords in a bit and scale by n
-#     coords=[(x+padding,y+padding) for (x,y) in coords]
-#     maxx,maxy=0,0
-#     for x,y in coords:
-#         maxx=max(x,maxx)
-#         maxy=max(y,maxy)
-#     maxx+=padding
-#     maxy+=padding
-#     img=Image.new("RGB",(int(maxx),int(maxy)),color=(255,255,255))
-    
-#     font=ImageFont.load_default()
-#     d=ImageDraw.Draw(img);
-    
-#     for i in range(num_cities):
-#         j=(i+1)%num_cities
-#         city_i=tour[i]
-#         city_j=tour[j]
-#         x1,y1=coords[city_i]
-#         x2,y2=coords[city_j]
-#         d.line((int(x1),int(y1),int(x2),int(y2)),fill=(0,0,0))
-#         d.text((int(x1)+7,int(y1)-5),str(i),font=font,fill=(32,32,32))
-    
-    
-#     for x,y in coords:
-#         x,y=int(x),int(y)
-#         d.ellipse((x-5,y-5,x+5,y+5),outline=(0,0,0),fill=(196,196,196))
-#     del d
-#     img.save(img_file, "PNG")
-
-# def drawtour_on_map(coords, tour):
-#     '''return a list of tuples to use in drawing on map. Each tuple represents
-#     a tour segment.
-#     '''
-#     num_cities = len(tour)
-#     print num_cities
-#     list_of_tour_segments = []
-
-#     for i in range(num_cities):
-#         city_i=tour[i]
-#         list_of_tour_segments.append(coords[city_i])
-#     return list_of_tour_segments
 
 def drawtour_on_map2(coord_dict, tour):
     '''return a list of tuples to use in drawing on map. Each tuple represents
     a tour segment.
     '''
-    # print tour
-    # print coord_dict, "coord_dict"
+
     list_of_tour_segments = []
-    # print tour, "tour"
+
     for city in tour:
-        # print city, "city"
         list_of_tour_segments.append(coord_dict[city])
-        # print list_of_tour_segments, "list of tour segments"
     return list_of_tour_segments
 
 
@@ -322,8 +208,6 @@ def hillclimb(
         #animation steps that are not improvements are not shown in the count.
         animation_steps.append(best)
         current_score.append(best_score)
-        #print len(animation_steps)
-        #print current_score
     return (num_evaluations,best_score,best, animation_steps, current_score)
 
 def hillclimb_and_restart(
@@ -354,23 +238,14 @@ def hillclimb_and_restart(
         if score > best_score or best is None:
             best_score=score
             best=found
-        print "score =", score
-        print "current_score =", current_score
-        print "best_score=", best_score
-    animation_steps_total+=[best]
-    #best_score.append(best)
-    print best, "best"
-    print animation_steps, "steps"
-    print animation_steps_total, "total"
-        
+    animation_steps_total+=[best]       
     return (num_evaluations,best_score,best,animation_steps_total, current_score)
 
 
 #Nearest Neighbor algorithm
 def greedy(dist, start_city):
-    # print dist, "dist"
-    # print start_city, "start_city"
     '''solve using the greedy algorithm.'''
+
     city_tuples=dist.keys()
     unvisited_cities_list = []
     for item in city_tuples:
@@ -381,7 +256,6 @@ def greedy(dist, start_city):
     solution = [current_city]
 
     def distance_from_current_city(to):
-        # print current_city, to
         return dist[(current_city, to)]
 
     while unvisited_cities:
@@ -391,7 +265,6 @@ def greedy(dist, start_city):
         solution.append(next_city)
         current_city = next_city
     length = tour_length(dist, solution)
-    # print "length", length, "solution", solution
     return (None, length, solution)
 
 
@@ -486,10 +359,7 @@ def anneal(init_function,move_operator,objective_function,max_evaluations,
     score_list=objective_function.score_list
     objective_function.steps.append(best)
 
-    #print 'final temperature: %f'%temperature
-    #print num_evaluations, best_score
     #print 'anneal finished: num_evaluations=%d, best_score=%f'%num_evaluations,best_score
-    #print score_list
     return (num_evaluations,best_score,best, objective_function.steps, score_list)
 
 
