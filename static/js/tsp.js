@@ -85,25 +85,25 @@ function begin(){
   get_cities_list();
 }
 
-function get_cities_data(evt){
-    $.ajax({
-          type: 'GET',
-          url: "/get_cities_data",
-          dataType: 'json',
-          success: function(data) {
-            for (i=0; i< data.length; i++){
-                cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
-            }
-            drop();
-            $("#cities").hide();
-            $("#input").show();
-          }
-        });
-}
+// function get_cities_data(evt){
+//     $.ajax({
+//           type: 'GET',
+//           url: "/get_cities_data",
+//           dataType: 'json',
+//           success: function(data) {
+//             for (i=0; i< data.length; i++){
+//                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
+//             }
+//             drop();
+//             $("#cities").hide();
+//             $("#input").show();
+//           }
+//         });
+// }
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
-    // console.log(i);
+    console.log(cities);
     setTimeout(function() {
       addMarker();
     }, i * 10);
@@ -257,13 +257,13 @@ function drawAnimation(animation_coords){
 }
 
 function addMarker() {
-          // console.log('in addMarker')
           markers.push(new google.maps.Marker({
             position: cities[iterator],
             map: map,
             draggable: false,
             icon: "http://labs.google.com/ridefinder/images/mm_20_gray.png",
-            animation: google.maps.Animation.DROP
+            animation: google.maps.Animation.DROP,
+            title: selected_cities[iterator][1]
           }));
           iterator++;
         }
@@ -396,10 +396,10 @@ function handleCitiesForm(evt) {
       for (i=0; i< data.length; i++){
                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
                 selected_cities.push([data[i].id, data[i].city]);
-                // console.log("id", data[i].id);
+                console.log("id", data[i].id);
             }
       drop();
-      // console.log("selected_cities", selected_cities);
+      console.log("selected_cities", selected_cities);//city name is at selected_cities[i][1]
       get_start_city(selected_cities); //populate the cities for nearest neighbor
       $("#cities").hide();
       $("#input").show();
