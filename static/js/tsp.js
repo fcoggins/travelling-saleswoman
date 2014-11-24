@@ -1,3 +1,5 @@
+var MAP_PIN = 'M0-165c-27.618 0-50 21.966-50 49.054C-50-88.849 0 0 0 0s50-88.849 50-115.946C50-143.034 27.605-165 0-165z';
+
 $(document).ready(function () {
 
 var cities = [];
@@ -15,6 +17,7 @@ var cities_string = "";
 google.maps.event.addDomListener(window, 'load', initialize);
 window.setTimeout(show_intro(), 100);
 $("#continue").on("click", begin);
+$("#new").on("click", new_tour);
 $("#drop").on("click", handleCitiesForm);
 $("#userinput").on("submit", handleFormSubmit);
 $("#clear").on("click", clear);
@@ -32,6 +35,7 @@ $("#select_algorithm").on("click", function(evt){
     $("#submitbutton").show();
     $(".stop_clear").show();
     $("#next_algorithm").show();
+    $(".new_tour").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $(".mode_class").prepend('<h4>Algorithm: Nearest Neighbor</h4>');
@@ -45,6 +49,7 @@ $("#select_algorithm").on("click", function(evt){
     $("#submitbutton").show();
     $(".stop_clear").show();
     $("#next_algorithm").show();
+    $(".new_tour").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $("#stop").show();
@@ -64,6 +69,7 @@ $("#select_algorithm").on("click", function(evt){
     $("#submitbutton").show();
     $(".stop_clear").show();
     $("#next_algorithm").show();
+    $(".new_tour").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $("#stop").show();
@@ -103,7 +109,6 @@ function begin(){
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
-    console.log(cities);
     setTimeout(function() {
       addMarker();
     }, i * 10);
@@ -257,14 +262,22 @@ function drawAnimation(animation_coords){
 }
 
 function addMarker() {
-          markers.push(new google.maps.Marker({
-            position: cities[iterator],
-            map: map,
-            draggable: false,
-            icon: "http://labs.google.com/ridefinder/images/mm_20_gray.png",
-            animation: google.maps.Animation.DROP,
-            title: selected_cities[iterator][1]
-          }));
+    var fillcolor = "#99aead";
+      markers.push(new google.maps.Marker({
+        position: cities[iterator],
+        map: map,
+        draggable: false,
+        icon: {
+        path: MAP_PIN,
+        fillColor: fillcolor,
+        fillOpacity: 1,
+        strokeColor: '#000',
+        strokeWeight: 1,
+        scale: 1/8
+        },
+        animation: google.maps.Animation.DROP,
+        title: "selected_cities[iterator][1]"
+      }));
           iterator++;
         }
 
@@ -380,13 +393,12 @@ function resetMyForm(){
     $("label[for='algorithm']").show();
     $("#algorithm").show();
     $(".mode_class > h4").remove();
+    clear_start_city(selected_cities);
     clear();
 }
 
 function handleCitiesForm(evt) {
   evt.preventDefault();
-  // console.log('handleCitiesForm');
-  // console.log($("#cityinput").serializeArray());
   $.ajax({
     type: "POST",
     url: "/get_cities_data",
@@ -396,23 +408,20 @@ function handleCitiesForm(evt) {
       for (i=0; i< data.length; i++){
                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
                 selected_cities.push([data[i].id, data[i].city]);
-                console.log("id", data[i].id);
             }
-      drop();
-      console.log("selected_cities", selected_cities);//city name is at selected_cities[i][1]
+
       get_start_city(selected_cities); //populate the cities for nearest neighbor
       $("#cities").hide();
       $("#input").show();
+        drop();
     }
   });
 }
 
 function handleFormSubmit(evt) {
     evt.preventDefault();
-    // console.log(selected_cities);
     var jsonText = $('#userinput').serialize();
     jsonText += "&selected_cities="+selected_cities;
-    // console.log(jsonText);
     $.ajax({
         type: "POST",
         url: "/userinput",
@@ -432,7 +441,7 @@ function handleFormSubmit(evt) {
             $('#results').show();
 
             //import our data
-            var image = data.img_file;
+            //var image = data.img_file;
             tour_coords = data.tour_coords;
             var animation_coords = data.animation_coords;
             iterations = data.iterations;
@@ -448,9 +457,26 @@ function handleFormSubmit(evt) {
             polyline_best_tour = data.poly_list;
             var poly_animation_steps = data.poly_animation_steps;
 
-            //Draw on our map
-            // $('#plot').attr("src", data.img_file);
             if($('#algorithm').val() == 'nearest'){
+                clear_start_city(selected_cities);
+                start_city_coords = new google.maps.LatLng(tour_coords[0][0], -tour_coords[0][1]);
+                var fillcolor = "#28363d";
+                  markers.push(new google.maps.Marker({
+                    position: start_city_coords,
+                    map: map,
+                    draggable: false,
+                    icon: {
+                    path: MAP_PIN,
+                    fillColor: fillcolor,
+                    fillOpacity: 1,
+                    strokeColor: '#000',
+                    strokeWeight: 1,
+                    scale: 1/8
+                    },
+                    animation: google.maps.Animation.DROP,
+                    title: tour_cities[0]
+                  }));
+
               if($('#mode').val() == 'as_the_crow_flies'){
                 drawNearestNeighbor(tour_coords);
               }
@@ -476,7 +502,72 @@ function handleFormSubmit(evt) {
       }
 });
 }
-});
+
+function clear_start_city(selected_cities){
+    var fillcolor = "#99aead";
+    for(i=0; i<selected_cities.length; i++){
+    markers.push(new google.maps.Marker({
+        position: cities[i],
+        map: map,
+        draggable: false,
+        icon: {
+        path: MAP_PIN,
+        fillColor: fillcolor,
+        fillOpacity: 1,
+        strokeColor: '#000',
+        strokeWeight: 1,
+        scale: 1/8
+        },
+        animation: null,
+        title: selected_cities[i][1]
+      }));
+        }
+        }
+
+    function new_tour(){
+        selected_cities = [];
+        tour_cities = [];
+        cities = [];
+        iterator = 0;
+        $("#input").hide();
+        resetMyForm();
+        deleteMarkers();
+        polyline = null;
+        linePath.setMap(null);
+        iterations = null;
+        best_score = null;
+        cities_string = "";
+        polyline_best_tour = [];        
+        for (var i=0; i<linePaths.length; i++){
+                linePaths[i].setMap(null);
+            }
+    begin();
+    }
+
+    // Sets the map on all markers in the array.
+function setAllMap(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+  setAllMap(null);
+}
+
+// Shows any markers currently in the array.
+function showMarkers() {
+  setAllMap(map);
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+  clearMarkers();
+  markers = [];
+}
+
+});// close document.ready function
 
 //populate the cities drop down list in the form
 function get_cities_list(){
@@ -517,5 +608,8 @@ function get_start_city(selected_cities){
             }
             $('#start').html(text);
         }
+
+
+
 
 
