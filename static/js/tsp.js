@@ -12,9 +12,6 @@ var neighborPaths = [];
 var selected_cities = [];
 var cities_string = "";
 
-
-
-
 $(document).ready(function () {
 google.maps.event.addDomListener(window, 'load', initialize);
 window.setTimeout(show_intro(), 100);
@@ -313,7 +310,7 @@ function drawNeighborRoad(){
         if (i>polyline_best_tour.length-2){
             clearInterval(drawFunction);
            //close the loop
-            path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);  
+            path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
             linePath = new google.maps.Polyline({
                 path: path,
                 geodesic: true,
@@ -388,19 +385,11 @@ function resetMyForm(){
 
 function handleCitiesForm(evt) {
   evt.preventDefault();
-  console.log (selected_cities_text);
-  //var obj = JSON.parse(selected_cities_text);
-  //var obj = JSON.stringify(selected_cities_text);
-  //$.toJSON(selected_cities_text);
-  //console.log (obj);
 
-
-  console.log($('#cityinput').serializeArray());
   $.ajax({
     type: "POST",
     url: "/get_cities_data",
     data: $('#cityinput').serializeArray(),
-    //data: obj,
     dataType: "json",
     success: function( data ) {
       for (i=0; i< data.length; i++){
@@ -599,31 +588,51 @@ function get_cities_list(){
                 }));
             }
             $('#city_group').html(text);
-            //test getting markers to react when clicked on
-            console.log(markers.length);
             selected_cities_text = [{'city_group':null}, {'city_group':null}];
             for (var j=0; j < markers.length; j++){
-                google.maps.event.addListener(markers[j], 'click', bindClick(j, iterator));
+                google.maps.event.addListener(markers[j], 'click', bindClick(j));
             }
             
             function bindClick(k){
-                return function(){       
-                    console.log(data[k].city, data[k].id, 'clicked');
+                return function(){
                     var select_list = [];
+                    //change the marker color here
+                    change_Marker_Red(k);
+
                     $('#city_group option').each(function(){
                         select_list.push($(this).val());
                     });
                     console.log(select_list, "select");
                     for (var i=0; i<select_list.length; i++){
                         if(select_list[i] == data[k].id - 1){
-                            console.log(select_list[i]);
                             $('#city_group option[value='+select_list[i]+']').attr("selected","selected");
                         }
                     }
                 };
             }
-
     }
+    });
+}
+
+$( "#city_group" ).change(function(evt){
+console.log('change in dropdown');
+$( "#city_group option:selected" ).each(function() {
+      console.log($( this ).val()); //$(this).val()+1 is the city id
+      selected = $(this).val();
+      console.log(markers[selected]);
+      change_Marker_Red(selected);
+    });
+});
+                  
+  // 3. when you have the marker change its color 
+function change_Marker_Red(k){
+    markers[k].setIcon({
+    path: google.maps.SymbolPath.CIRCLE,
+    fillColor: '#ff530d',
+    fillOpacity: 1,
+    strokeColor: '#2f575d',
+    strokeWeight: 0.5,
+    scale: 3.5
     });
 }
 
@@ -644,62 +653,7 @@ $(function() {
   });
 
 
-//test OOP
 
-// function City(name) {
-//     this.name = name;
-//     this.lat = null;
-//     this.longitude = null;
-//     this.selected = false;
-// }
-
-
-
-// function Pet(name) {
-//     this.name = name;
-//     this.species = null;
-// }
-// Pet.prototype.speak = function() {
-//     return "I am " + this.name + ", a " + this.species;
-// };
-// Pet.prototype.constructor = Pet;
-
-
-// function Dog(name) {
-//     Pet.apply(this, arguments);
-//     this.species = 'Dog';
-// }
-// Dog.prototype = Object.create(Pet.prototype);
-// Dog.prototype.bark = function() {
-//     return "Woof";
-// };
-// Dog.prototype.constructor = Dog;
-
-
-// function TinyDog(name) {
-//     Dog.apply(this, arguments);
-// }
-// TinyDog.prototype = Object.create(Dog.prototype);
-// TinyDog.prototype.bark = function() {
-//     return "Meep!";
-// };
-
-// // Test
-
-// var snake = new Pet("Sammy");
-// console.log(snake.speak());
-
-
-// var fido = new Dog("Fido");
-// console.log(fido.speak());
-// console.log(fido.bark());
-
-// var tinyfido = new TinyDog("TinyFido");
-// console.log(tinyfido.speak());
-// console.log(tinyfido.bark());
-
-// var atlanta = new City("Atlanta");
-// console.log(atlanta.name, atlanta.selected);
 
 
 

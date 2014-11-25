@@ -1,16 +1,44 @@
 from flask import Flask, request, session as fsksession, render_template, g, redirect, url_for, flash
 import os, jinja2, random, string, json, sys
-import tsp, model
+import tsp, model, time, shelve
 #import credentials
 
 app = Flask(__name__)
 app.secret_key = '\xf5!\x07!qj\xa4\x08\xc6\xf8\n\x8a\x95m\xe2\x04g\xbb\x98|U\xa2f\x03'
 app.jinja_env.undefined = jinja2.StrictUndefined
 
+polyline_dict = {}
+
 @app.route("/")
 def index():
-    """Return the index page"""  
+    """Return the index page. Get data and build a polyline dictionary. 
+    Key will be edge in the form "city1_id-city2_id" and value will be 
+    the polyline."""
+    
+    global polyline_dict
+
+    if not os.path.isfile("polyline_ref.db"):
+        polyline_dict = shelve.open("polyline_ref")
+        build_file();
+    else:
+        polyline_dict = shelve.open("polyline_ref")
+
+
     return render_template("index2.html")
+
+
+def build_file():
+
+    global polyline_dict
+    distance = model.session.query(model.Distance).all()
+    time1 = time.time()
+    for i in range(len(distance)):
+        for j in range(len(distance)):
+            key = str(distance[i].city1_id)+"-"+str(distance[i].city2_id)
+            value = distance[i].polyline
+            polyline_dict[key]=value
+    time2 = time.time()
+    print "Cost to build table", (time2-time1)
 
 
 @app.route("/get_initial_data", methods=['GET'])
@@ -31,9 +59,7 @@ def get_cities_data():
     """returns list of cities + lat long as json, like:
     [ ("Annapolis", 34, 5), ("Austin", 2, 4)]
     """
-    print ("in get_cities")
     cities = request.form.getlist('city_group')
-    print(cities)
     nodes = []
     for city in cities:
         node = model.session.query(model.City).filter_by(id = int(city)+1).one()
@@ -123,8 +149,8 @@ def get_parameters():
     tour_cities = convert_tour_to_city(best)
 
     if mode == "roads":
-        poly_list = poly_line_tour(best)
-        poly_animation_steps = polyline_animation_steps(animation_steps)
+        poly_list, data = poly_line_tour2(best)
+        poly_animation_steps = polyline_animation_steps2(animation_steps)
     else:
         poly_list = []
         poly_animation_steps = []
@@ -159,6 +185,33 @@ def poly_line_tour(best):
 
     return poly_list
 
+def poly_line_tour2(best):
+    '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
+    which is a list of polylines [line1, line2 .... linex] for 48 cities best
+    includes each of the nodes from 0 to 47 once.'''
+    total_data_call = 0
+    poly_list = []
+    global polyline_dict
+
+    step_in = time.time()#step into the loop
+    for i in range(len(best)):
+        city1 = best[i]
+        city2 = best[(i+1)%len(best)]
+        lookup_string = str(city1)+'-'+str(city2)
+        #This may be why it is running slow. Hard code? Change database??
+        before_data_call = time.time()
+        polyline = polyline_dict[lookup_string]
+        
+        after_data_call = time.time()
+        total_data_call += (-before_data_call+after_data_call)
+        
+        
+        poly_list.append(polyline)
+    step_out = time.time()
+    print "returning each polyline tour2", (step_out - step_in)
+    print "total data call =", total_data_call
+    return (poly_list, total_data_call)
+
 def polyline_animation_steps(animation_steps):
     '''Converts animation steps (list of nodes) to polylines. Each polyline is a list of polyline segments.
 
@@ -168,9 +221,25 @@ def polyline_animation_steps(animation_steps):
 
     poly_animation_steps = []
     for i in range(len(animation_steps)):
-        line = poly_line_tour(animation_steps[i])
+        line = poly_line_tour2(animation_steps[i])
         poly_animation_steps.append(line)
 
+    return poly_animation_steps
+
+def polyline_animation_steps2(animation_steps):
+    '''Converts animation steps (list of nodes) to polylines. Each polyline is a list of polyline segments.
+    
+    input: List of lists of nodes
+    returns: List of lists of polylines
+    '''
+    #1 call here may be slow here
+    total = 0
+    poly_animation_steps = []
+    for i in range(len(animation_steps)):
+        line, data = poly_line_tour2(animation_steps[i])
+        poly_animation_steps.append(line)
+        total += data
+    print total, "for getting data out of database"
     return poly_animation_steps
 
 if __name__ == "__main__":
