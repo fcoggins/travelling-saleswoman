@@ -21,7 +21,7 @@ def get_initial_data():
     nodes = model.session.query(model.City).all()
     city_list = []
     for i in range(len(nodes)):
-        city_list.append({'city': nodes[i].city})
+        city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude, 'id': nodes[i].id})
     return json.dumps(city_list)
 
 
@@ -31,8 +31,9 @@ def get_cities_data():
     """returns list of cities + lat long as json, like:
     [ ("Annapolis", 34, 5), ("Austin", 2, 4)]
     """
-
+    print ("in get_cities")
     cities = request.form.getlist('city_group')
+    print(cities)
     nodes = []
     for city in cities:
         node = model.session.query(model.City).filter_by(id = int(city)+1).one()

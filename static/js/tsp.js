@@ -1,12 +1,10 @@
 var MAP_PIN = 'M0-165c-27.618 0-50 21.966-50 49.054C-50-88.849 0 0 0 0s50-88.849 50-115.946C50-143.034 27.605-165 0-165z';
-
-$(document).ready(function () {
-
+var MAP_CIRCLE = google.maps.SymbolPath.CIRCLE;
 var cities = [];
 var markers = [];
 var iterator = 0;
 var map;
-var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour;
+var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour, selected_cities_text;
 var drawAnimationFunction;
 var polyline;
 var linePaths = [];
@@ -14,6 +12,10 @@ var neighborPaths = [];
 var selected_cities = [];
 var cities_string = "";
 
+
+
+
+$(document).ready(function () {
 google.maps.event.addDomListener(window, 'load', initialize);
 window.setTimeout(show_intro(), 100);
 $("#continue").on("click", begin);
@@ -58,7 +60,7 @@ $("#select_algorithm").on("click", function(evt){
       }
       else
       {
-      $(".mode_class").prepend('<h4>Algorithm: Hillclimb & Restart</h4>'); 
+      $(".mode_class").prepend('<h4>Algorithm: Hillclimb & Restart</h4>');
       }
     }
   else if (algorithm == 'annealing'){
@@ -82,30 +84,17 @@ $("#select_algorithm").on("click", function(evt){
 
 
 function show_intro(){
-  $("#intro").show();
-}
+    setTimeout(function() {
+        $( "#intro" ).hide().fadeIn();
+      }, 1500 );
+    }
+//}
 
 function begin(){
-  $("#intro").hide();
-  $("#cities").show();
+  $("#intro").hide().fadeOut();
+  $("#cities").show().fadeIn();
   get_cities_list();
 }
-
-// function get_cities_data(evt){
-//     $.ajax({
-//           type: 'GET',
-//           url: "/get_cities_data",
-//           dataType: 'json',
-//           success: function(data) {
-//             for (i=0; i< data.length; i++){
-//                 cities.push(new google.maps.LatLng(data[i].lat, -data[i].longitude));
-//             }
-//             drop();
-//             $("#cities").hide();
-//             $("#input").show();
-//           }
-//         });
-// }
 
 function drop() {
   for (var i = 0; i < cities.length; i++) {
@@ -276,7 +265,7 @@ function addMarker() {
         scale: 1/8
         },
         animation: google.maps.Animation.DROP,
-        title: "selected_cities[iterator][1]"
+        title: selected_cities[iterator][1]
       }));
           iterator++;
         }
@@ -399,10 +388,19 @@ function resetMyForm(){
 
 function handleCitiesForm(evt) {
   evt.preventDefault();
+  console.log (selected_cities_text);
+  //var obj = JSON.parse(selected_cities_text);
+  //var obj = JSON.stringify(selected_cities_text);
+  //$.toJSON(selected_cities_text);
+  //console.log (obj);
+
+
+  console.log($('#cityinput').serializeArray());
   $.ajax({
     type: "POST",
     url: "/get_cities_data",
     data: $('#cityinput').serializeArray(),
+    //data: obj,
     dataType: "json",
     success: function( data ) {
       for (i=0; i< data.length; i++){
@@ -569,37 +567,66 @@ function deleteMarkers() {
 
 });// close document.ready function
 
-//populate the cities drop down list in the form
+
+
+//initial population of cities drop down and add all cities to map
 function get_cities_list(){
+    var iterator = 0;
     $.ajax({
           type: 'GET',
           url: "/get_initial_data",
           dataType: 'json',
           success: function(data) {
+            
             text = "";
-            for (i=0; i< data.length; i++){
+            for (var i=0; i< data.length; i++){
+                //create the dropdown
                 text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
+                //add markers for all cities on map
+                var pos = new google.maps.LatLng(data[i].lat, -data[i].longitude);
+                markers.push(new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#6d9197',
+                        fillOpacity: 1,
+                        strokeColor: '#2f575d',
+                        strokeWeight: 0.5,
+                        scale: 3.5
+                        },
+                    title: data[i].city
+                }));
             }
             $('#city_group').html(text);
-        }
+            //test getting markers to react when clicked on
+            console.log(markers.length);
+            selected_cities_text = [{'city_group':null}, {'city_group':null}];
+            for (var j=0; j < markers.length; j++){
+                google.maps.event.addListener(markers[j], 'click', bindClick(j, iterator));
+            }
+            
+            function bindClick(k){
+                return function(){       
+                    console.log(data[k].city, data[k].id, 'clicked');
+                    var select_list = [];
+                    $('#city_group option').each(function(){
+                        select_list.push($(this).val());
+                    });
+                    console.log(select_list, "select");
+                    for (var i=0; i<select_list.length; i++){
+                        if(select_list[i] == data[k].id - 1){
+                            console.log(select_list[i]);
+                            $('#city_group option[value='+select_list[i]+']').attr("selected","selected");
+                        }
+                    }
+                };
+            }
+
+    }
     });
 }
 
-//select the start city from the group of selected cities
-// function get_start_city(){
-//     $.ajax({
-//           type: 'GET',
-//           url: "/get_initial_data",
-//           dataType: 'json',
-//           success: function(data) {
-//             text = "";
-//             for (i=0; i< data.length; i++){
-//                 text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
-//             }
-//             $('#start').html(text);
-//         }
-//     });
-// }
 
 function get_start_city(selected_cities){
             text = "";
@@ -608,6 +635,71 @@ function get_start_city(selected_cities){
             }
             $('#start').html(text);
         }
+
+$(function() {
+    $( "#intro" ).draggable();
+    $( "#cities" ).draggable();
+    $( "#input" ).draggable();
+    $( "#results" ).draggable();
+  });
+
+
+//test OOP
+
+// function City(name) {
+//     this.name = name;
+//     this.lat = null;
+//     this.longitude = null;
+//     this.selected = false;
+// }
+
+
+
+// function Pet(name) {
+//     this.name = name;
+//     this.species = null;
+// }
+// Pet.prototype.speak = function() {
+//     return "I am " + this.name + ", a " + this.species;
+// };
+// Pet.prototype.constructor = Pet;
+
+
+// function Dog(name) {
+//     Pet.apply(this, arguments);
+//     this.species = 'Dog';
+// }
+// Dog.prototype = Object.create(Pet.prototype);
+// Dog.prototype.bark = function() {
+//     return "Woof";
+// };
+// Dog.prototype.constructor = Dog;
+
+
+// function TinyDog(name) {
+//     Dog.apply(this, arguments);
+// }
+// TinyDog.prototype = Object.create(Dog.prototype);
+// TinyDog.prototype.bark = function() {
+//     return "Meep!";
+// };
+
+// // Test
+
+// var snake = new Pet("Sammy");
+// console.log(snake.speak());
+
+
+// var fido = new Dog("Fido");
+// console.log(fido.speak());
+// console.log(fido.bark());
+
+// var tinyfido = new TinyDog("TinyFido");
+// console.log(tinyfido.speak());
+// console.log(tinyfido.bark());
+
+// var atlanta = new City("Atlanta");
+// console.log(atlanta.name, atlanta.selected);
 
 
 
