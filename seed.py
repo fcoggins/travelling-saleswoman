@@ -65,10 +65,10 @@ def read_directions_files(session):
 
 def load_cities(session):
 
-    with open('capitals.csv', 'r') as csvfile:
+    with open('big_cities.csv', 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter = ",")
         for row in reader:
-            city = model.City(city=row[1], state=row[0], lat=row[2], longitude=row[3])
+            city = model.City(city=row[1], state=row[0], lat=row[2], longitude=row[3], capital=row[4])
             session.add(city)
     session.commit()
 
@@ -94,9 +94,10 @@ def load_cities(session):
 
 def main(session):
 
-    read_directions_files(session)
+    #read_directions_files(session)
     #load_directions(session)
     #load_distance(session)
+    load_cities(session)
 
 
 if __name__ == "__main__":

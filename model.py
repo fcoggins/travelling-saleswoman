@@ -22,6 +22,7 @@ class City(Base):
     state = Column(String(64))
     lat = Column(Float(15))
     longitude = Column(Float(15))
+    capital = Column(Integer) #0 not a state capital, 1 is a capital
 
 class Distance(Base):
     __tablename__ = "distance"
