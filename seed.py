@@ -5,15 +5,15 @@ import credentials
 
 def load_directions(session):
 
-    api_key = credentials.API_KEY
+    api_key = credentials.API_KEY_2
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     nodes = model.session.query(model.City).all()
-    for i in range(44, len(nodes)):
+    for i in range(59, 60):
         city1 = nodes[i].city
         state1 = nodes[i].state
         city1_escaped = (city1 + "," + state1).replace(" ", "%20")
         city1_underscore = city1.replace (" ", "_")
-        for j in range(len(nodes)):
+        for j in range(66):
             city2 = nodes[j].city
             state2 = nodes[j].state
             city2_escaped = (city2 + "," + state2).replace(" ", "%20")
@@ -41,9 +41,9 @@ def read_directions_files(session):
         city1 = nodes[i].city
         for j in range(len(nodes)):
             city2 = nodes[j].city
-            print(i,j)
+            #print(i,j)
             if city1 == city2:
-                print "Hello"
+                #print "Hello"
                 continue
             #parse into filename
             city1_underscore = city1.replace (" ", "_")
@@ -95,9 +95,9 @@ def load_cities(session):
 def main(session):
 
     #read_directions_files(session)
-    #load_directions(session)
+    load_directions(session)
     #load_distance(session)
-    load_cities(session)
+    #load_cities(session)
 
 
 if __name__ == "__main__":
