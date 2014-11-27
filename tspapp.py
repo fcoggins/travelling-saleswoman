@@ -19,6 +19,7 @@ def index():
 
     if not os.path.isfile("polyline_ref.db"):
         polyline_dict = shelve.open("polyline_ref")
+        print "no file"
         build_file();
     else:
         polyline_dict = shelve.open("polyline_ref")
@@ -30,11 +31,13 @@ def index():
 def build_file():
 
     global polyline_dict
+    print "in build file"
     distance = model.session.query(model.Distance).all()
     time1 = time.time()
     for i in range(len(distance)):
         for j in range(len(distance)):
             key = str(distance[i].city1_id)+"-"+str(distance[i].city2_id)
+
             value = distance[i].polyline
             polyline_dict[key]=value
     time2 = time.time()
@@ -49,7 +52,7 @@ def get_initial_data():
     nodes = model.session.query(model.City).all()
     city_list = []
     for i in range(len(nodes)):
-        city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude, 'id': nodes[i].id})
+        city_list.append({'city': nodes[i].city, 'lat': nodes[i].lat, 'longitude': nodes[i].longitude, 'id': nodes[i].id,  'capital': nodes[i].capital})
     return json.dumps(city_list)
 
 

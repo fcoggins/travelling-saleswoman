@@ -573,17 +573,30 @@ function get_cities_list(){
                 text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
                 //add markers for all cities on map
                 var pos = new google.maps.LatLng(data[i].lat, -data[i].longitude);
-                markers.push(new google.maps.Marker({
-                    position: pos,
-                    map: map,
-                    icon: {
+                var capital = data[i].capital;
+                if (capital === 0){
+                    icontype = {
                         path: google.maps.SymbolPath.CIRCLE,
                         fillColor: '#6d9197',
                         fillOpacity: 1,
                         strokeColor: '#2f575d',
                         strokeWeight: 0.5,
-                        scale: 3.5
-                        },
+                        scale: 3.7
+                    };
+                }
+                else
+                {
+                    icontype = {
+                        url: 'static/img/star.gif',
+                        size: new google.maps.Size(14, 13),
+                        origin: new google.maps.Point(0,0),
+                        anchor: new google.maps.Point(6, 6)
+                    };
+                }
+                markers.push(new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    icon: icontype,
                     title: data[i].city
                 }));
             }
@@ -651,6 +664,7 @@ $(function() {
     $( "#input" ).draggable();
     $( "#results" ).draggable();
   });
+
 
 
 
