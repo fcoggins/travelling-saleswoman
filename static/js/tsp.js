@@ -593,11 +593,15 @@ function get_cities_list(){
                         anchor: new google.maps.Point(6, 6)
                     };
                 }
-                markers.push(new google.maps.Marker({
+                markers.push(new MarkerWithLabel({
                     position: pos,
                     map: map,
                     icon: icontype,
-                    title: data[i].city
+                    title: data[i].city,
+                    labelContent: data[i].city,
+                    labelAnchor: new google.maps.Point(0, 0),
+                    labelClass: "labels", // the CSS class for the label
+                    labelStyle: {opacity: 0.75}
                 }));
             }
             $('#city_group').html(text);
