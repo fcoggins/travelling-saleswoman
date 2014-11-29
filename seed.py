@@ -7,6 +7,51 @@ def load_flight_data(session):
 
     api_key = credentials.API_KEY
     url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
+    nodes = model.session.query(model.City).all()
+    for i in range (3, len(nodes)):
+        code1 = nodes[i].airport_code
+        city1 = nodes[i].city.replace(" ", "_")
+        print city1
+        for j in range (len(nodes)):
+            code2 = nodes[j].airport_code
+            city2 = nodes[j].city.replace(" ", "_")
+            print city2
+            if code1 == code2:
+                continue
+            data = {
+              "request": {
+                "slice": [
+                  {
+                    "origin": "ATL",
+                    "destination": "SFO",
+                    "date": "2014-12-15"
+                  }
+                ],
+                "passengers": {
+                  "adultCount": 1,
+                  "infantInLapCount": 0,
+                  "infantInSeatCount": 0,
+                  "childCount": 0,
+                  "seniorCount": 0
+                },
+                "solutions": 10,
+                "refundable": False
+              }
+            }
+
+            jsondata=json.dumps(data)
+            
+            filename = "airline_data/"+city1+'-'+city2+".json"
+            req = Request(url, jsondata, {'Content-Type': 'application/json'})
+            response = urlopen(req)
+            results = response.read()
+            f = open(filename, "w")
+            f.write(results)
+            print filename, "wrote file"
+            f.close()
+
+
+
 
 
     # data = '{"nw_src": "10.0.0.1/32", "nw_dst": "10.0.0.2/32", "nw_proto": "ICMP", "actions": "ALLOW", "priority": "10"}'
@@ -112,7 +157,8 @@ def main(session):
     #read_directions_files(session)
     #load_directions(session)
     #load_distance(session)
-    load_cities(session)
+    #load_cities(session)
+    load_flight_data(session)
 
 
 if __name__ == "__main__":
