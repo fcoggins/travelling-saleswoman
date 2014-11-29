@@ -3,6 +3,21 @@ import csv
 from urllib2 import Request, urlopen
 import credentials
 
+def load_flight_data(session):
+
+    api_key = credentials.API_KEY
+    url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
+
+
+    # data = '{"nw_src": "10.0.0.1/32", "nw_dst": "10.0.0.2/32", "nw_proto": "ICMP", "actions": "ALLOW", "priority": "10"}'
+    # req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+    # f = urllib2.urlopen(req)
+    # for x in f:
+    # print(x)
+    # f.close()
+
+
+
 def load_directions(session):
 
     api_key = credentials.API_KEY_2
@@ -65,10 +80,10 @@ def read_directions_files(session):
 
 def load_cities(session):
 
-    with open('big_cities.csv', 'r') as csvfile:
+    with open('all_cities.csv', 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter = ",")
         for row in reader:
-            city = model.City(city=row[1], state=row[0], lat=row[2], longitude=row[3], capital=row[4])
+            city = model.City(city=row[1], state=row[0], lat=row[2], longitude=row[3], capital=row[4], airport_code=row[5])
             session.add(city)
     session.commit()
 
@@ -94,10 +109,10 @@ def load_cities(session):
 
 def main(session):
 
-    read_directions_files(session)
+    #read_directions_files(session)
     #load_directions(session)
     #load_distance(session)
-    #load_cities(session)
+    load_cities(session)
 
 
 if __name__ == "__main__":
