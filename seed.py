@@ -108,13 +108,13 @@ def read_directions_files(session):
             #read road data in
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
-            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
-            f = open(filename)
-            jsondata = f.read()
-            data = json.loads(jsondata)
-            f.close()
-            leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
-            leg_polyline = data["routes"][0]["overview_polyline"]["points"]
+            # filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
+            # f = open(filename)
+            # jsondata = f.read()
+            # data = json.loads(jsondata)
+            # f.close()
+            # leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
+            # leg_polyline = data["routes"][0]["overview_polyline"]["points"]
 
             #read airline data in
             filename = "airline_data/"+city1_underscore+'-'+city2_underscore+".json"
@@ -131,15 +131,16 @@ def read_directions_files(session):
                 print cost, time
 
             #load everything
-            distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
-                road_miles = leg_miles, polyline = leg_polyline, cost1,cost2,cost3,
-                cost4,cost5,cost6,cost7,cost8,cost9,cost10 = *cost, )
+            # distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
+            #     road_miles = leg_miles, polyline = leg_polyline, cost1,cost2,cost3,
+            #     cost4,cost5,cost6,cost7,cost8,cost9,cost10 = *cost, time1, time2, time3,
+            #     time4, time5, time6, time7, time8, time9, time10 = *time)
             
 
             
 
-            session.add(distance)
-    session.commit()
+            # session.add(distance)
+    # session.commit()
 
 
 
