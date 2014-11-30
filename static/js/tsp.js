@@ -4,7 +4,7 @@ var cities = [];
 var markers = [];
 var iterator = 0;
 var map;
-var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour, selected_cities_text;
+var linePath, iterations, best_score, tour_cities, tour_coords, current_score, polyline_best_tour;
 var drawAnimationFunction;
 var polyline;
 var linePaths = [];
@@ -571,6 +571,7 @@ function get_cities_list(){
             for (var i=0; i< data.length; i++){
                 //create the dropdown
                 text +="<option value='"+ i +"'>"+ data[i].city +"</option>";
+
                 //add markers for all cities on map
                 var pos = new google.maps.LatLng(data[i].lat, -data[i].longitude);
                 var capital = data[i].capital;
@@ -593,6 +594,7 @@ function get_cities_list(){
                         anchor: new google.maps.Point(6, 6)
                     };
                 }
+
                 markers.push(new MarkerWithLabel({
                     position: pos,
                     map: map,
@@ -604,8 +606,10 @@ function get_cities_list(){
                     labelStyle: {opacity: 0.75}
                 }));
             }
-            $('#city_group').html(text);
-            selected_cities_text = [{'city_group':null}, {'city_group':null}];
+
+            $('#city_group').html(text); //create the dropdown
+
+            //selected_cities_text = [{'city_group':null}, {'city_group':null}];
             for (var j=0; j < markers.length; j++){
                 google.maps.event.addListener(markers[j], 'click', bindClick(j));
             }
@@ -613,16 +617,27 @@ function get_cities_list(){
             function bindClick(k){
                 return function(){
                     var select_list = [];
-                    //change the marker color here
-                    change_Marker_Red(k);
+                    var unclicked = false;
 
                     $('#city_group option').each(function(){
                         select_list.push($(this).val());
                     });
-                    console.log(select_list, "select");
+
+                  $('#city_group').children('option:selected').each(function(){
+                        if (data[k].id - 1 == $(this).val()){
+                          unclicked = true;
+                          console.log (unclicked);
+                          change_Marker_Green(k);
+                          console.log($('#city_group option[value='+$(this).val()+']'));
+                          $('#city_group option[value='+$(this).val()+']').removeAttr("selected");
+                        }
+                        });
+       
                     for (var i=0; i<select_list.length; i++){
-                        if(select_list[i] == data[k].id - 1){
+                        if(select_list[i] == data[k].id - 1 && unclicked === false){
+                            console.log (unclicked);
                             $('#city_group option[value='+select_list[i]+']').attr("selected","selected");
+                            change_Marker_Red(k);
                         }
                     }
                 };
@@ -632,20 +647,27 @@ function get_cities_list(){
 }
 
 $( "#city_group" ).change(function(evt){
-console.log('change in dropdown');
 $( "#city_group option:selected" ).each(function() {
-      console.log($( this ).val()); //$(this).val()+1 is the city id
       selected = $(this).val();
-      console.log(markers[selected]);
       change_Marker_Red(selected);
     });
 });
                   
-  // 3. when you have the marker change its color 
 function change_Marker_Red(k){
     markers[k].setIcon({
     path: google.maps.SymbolPath.CIRCLE,
     fillColor: '#ff530d',
+    fillOpacity: 1,
+    strokeColor: '#2f575d',
+    strokeWeight: 0.5,
+    scale: 3.5
+    });
+}
+
+function change_Marker_Green(k){
+    markers[k].setIcon({
+    path: google.maps.SymbolPath.CIRCLE,
+    fillColor: '#6d9197',
     fillOpacity: 1,
     strokeColor: '#2f575d',
     strokeWeight: 0.5,

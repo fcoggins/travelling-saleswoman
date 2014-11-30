@@ -1,3 +1,4 @@
+
 import model, tsp, time, json
 import csv
 from urllib2 import Request, urlopen
@@ -8,7 +9,7 @@ def load_flight_data(session):
     api_key = credentials.API_KEY
     url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
     nodes = model.session.query(model.City).all()
-    for i in range (3, len(nodes)):
+    for i in range (17, len(nodes)):
         code1 = nodes[i].airport_code
         city1 = nodes[i].city.replace(" ", "_")
         print city1
@@ -101,23 +102,42 @@ def read_directions_files(session):
         city1 = nodes[i].city
         for j in range(len(nodes)):
             city2 = nodes[j].city
-            #print(i,j)
             if city1 == city2:
-                #print "Hello"
                 continue
-            #parse into filename
+
+            #read road data in
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
             filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
-            print filename
             f = open(filename)
             jsondata = f.read()
             data = json.loads(jsondata)
-            #distance in miles. Now what do I do with it?
+            f.close()
             leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
             leg_polyline = data["routes"][0]["overview_polyline"]["points"]
+
+            #read airline data in
+            filename = "airline_data/"+city1_underscore+'-'+city2_underscore+".json"
+            f = open(filename)
+            jsondata = f.read()
+            data = json.loads(jsondata)
+            cost = []
+            time = []
+            for k in range(10):
+                option_cost = data['tripOption'][k]['saleTotal']
+                option_time = data['tripOption'][k]['slice'][0]['duration']
+                cost.append[option_cost]
+                time.append[option_time]
+                print cost, time
+
+            #load everything
             distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
-                road_miles = leg_miles, polyline = leg_polyline)
+                road_miles = leg_miles, polyline = leg_polyline, cost1,cost2,cost3,
+                cost4,cost5,cost6,cost7,cost8,cost9,cost10 = *cost, )
+            
+
+            
+
             session.add(distance)
     session.commit()
 
