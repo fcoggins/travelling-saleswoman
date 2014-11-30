@@ -9,11 +9,11 @@ def load_flight_data(session):
     api_key = credentials.API_KEY
     url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
     nodes = model.session.query(model.City).all()
-    for i in range (13, len(nodes)):
+    for i in range (0, 1):
         code1 = nodes[i].airport_code
         city1 = nodes[i].city.replace(" ", "_")
         print city1
-        for j in range (len(nodes)):
+        for j in range (52, len(nodes)):
             code2 = nodes[j].airport_code
             city2 = nodes[j].city.replace(" ", "_")
             print city2
@@ -111,13 +111,13 @@ def read_directions_files(session):
             #read road data in
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
-            # filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
-            # f = open(filename)
-            # jsondata = f.read()
-            # data = json.loads(jsondata)
-            # f.close()
-            # leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
-            # leg_polyline = data["routes"][0]["overview_polyline"]["points"]
+            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
+            f = open(filename)
+            jsondata = f.read()
+            data = json.loads(jsondata)
+            f.close()
+            leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
+            leg_polyline = data["routes"][0]["overview_polyline"]["points"]
 
             #read airline data in
             filename = "airline_data/"+city1_underscore+'-'+city2_underscore+".json"
@@ -126,27 +126,31 @@ def read_directions_files(session):
             jsondata = f.read()
             data = json.loads(jsondata)
             f.close()
-            cost = []
-            time = []
+
+            cost = {}
+            time = {}
             for k in range(10):
-                if data['trips']['tripOption'][k]['saleTotal']:
-                    option_cost = data['trips']['tripOption'][k]['saleTotal']
-                    option_time = data['trips']['tripOption'][k]['slice'][0]['duration']
-                    cost.append(option_cost)
-                    time.append(option_time)
-            print cost, time
+                cost[str(k)]=None
+                time[str(k)]=None
+            if data['trips'].get('tripOption') == None:
+                    print "No Data"
+                    continue
+            num_options = len(data['trips']['tripOption'])
+            for k in range(num_options):
+                option_cost = data['trips']['tripOption'][k]['saleTotal']
+                option_time = data['trips']['tripOption'][k]['slice'][0]['duration']
+                cost[str(k)]=float(option_cost[3:])
+                time[str(k)]=float(option_time)
+            print cost['0'], time['0']
 
             #load everything
-            # distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
-            #     road_miles = leg_miles, polyline = leg_polyline, cost1,cost2,cost3,
-            #     cost4,cost5,cost6,cost7,cost8,cost9,cost10 = *cost, time1, time2, time3,
-            #     time4, time5, time6, time7, time8, time9, time10 = *time)
-            
+            distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
+                road_miles = leg_miles, polyline = leg_polyline, cost1 = cost['0'],cost2 = cost['1'],cost3= cost['2'],
+                cost4= cost['3'],cost5= cost['4'],cost6= cost['5'],cost7= cost['6'],cost8= cost['7'],cost9= cost['8'],cost10=cost['9'], time1=time['0'], time2=time['1'], time3=time['2'],
+                time4=time['3'], time5=time['4'], time6=time['5'], time7=time['6'], time8=time['7'], time9=time['8'], time10=time['9'])           
 
-            
-
-            # session.add(distance)
-    # session.commit()
+            session.add(distance)
+    session.commit()
 
 
 
@@ -181,11 +185,11 @@ def load_cities(session):
 
 def main(session):
 
-    #read_directions_files(session)
+    read_directions_files(session)
     #load_directions(session)
     #load_distance(session)
     #load_cities(session)
-    load_flight_data(session)
+    #load_flight_data(session)
 
 
 if __name__ == "__main__":
