@@ -654,6 +654,7 @@ $( "#city_group option:selected" ).each(function() {
 });
                   
 function change_Marker_Red(k){
+    console.log(markers[k]);
     markers[k].setIcon({
     path: google.maps.SymbolPath.CIRCLE,
     fillColor: '#ff530d',

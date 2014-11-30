@@ -9,7 +9,7 @@ def load_flight_data(session):
     api_key = credentials.API_KEY
     url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
     nodes = model.session.query(model.City).all()
-    for i in range (17, len(nodes)):
+    for i in range (13, len(nodes)):
         code1 = nodes[i].airport_code
         city1 = nodes[i].city.replace(" ", "_")
         print city1
@@ -23,8 +23,8 @@ def load_flight_data(session):
               "request": {
                 "slice": [
                   {
-                    "origin": "ATL",
-                    "destination": "SFO",
+                    "origin": code1,
+                    "destination": code2,
                     "date": "2014-12-15"
                   }
                 ],
@@ -55,6 +55,7 @@ def load_flight_data(session):
 
 
 
+
     # data = '{"nw_src": "10.0.0.1/32", "nw_dst": "10.0.0.2/32", "nw_proto": "ICMP", "actions": "ALLOW", "priority": "10"}'
     # req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
     # f = urllib2.urlopen(req)
@@ -69,7 +70,7 @@ def load_directions(session):
     api_key = credentials.API_KEY_2
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     nodes = model.session.query(model.City).all()
-    for i in range(58, 59):
+    for i in range(1, 59):
         city1 = nodes[i].city
         state1 = nodes[i].state
         city1_escaped = (city1 + "," + state1).replace(" ", "%20")
@@ -100,9 +101,11 @@ def read_directions_files(session):
     #loop through the cities in nodes and extract the city name to grab the file
     for i in range(len(nodes)):
         city1 = nodes[i].city
+        airport1 = nodes[i].airport_code
         for j in range(len(nodes)):
             city2 = nodes[j].city
-            if city1 == city2:
+            airport2 = nodes[j].airport_code
+            if city1 == city2 or airport1 == airport2:
                 continue
 
             #read road data in
@@ -118,17 +121,20 @@ def read_directions_files(session):
 
             #read airline data in
             filename = "airline_data/"+city1_underscore+'-'+city2_underscore+".json"
+            print filename
             f = open(filename)
             jsondata = f.read()
             data = json.loads(jsondata)
+            f.close()
             cost = []
             time = []
             for k in range(10):
-                option_cost = data['tripOption'][k]['saleTotal']
-                option_time = data['tripOption'][k]['slice'][0]['duration']
-                cost.append[option_cost]
-                time.append[option_time]
-                print cost, time
+                if data['trips']['tripOption'][k]['saleTotal']:
+                    option_cost = data['trips']['tripOption'][k]['saleTotal']
+                    option_time = data['trips']['tripOption'][k]['slice'][0]['duration']
+                    cost.append(option_cost)
+                    time.append(option_time)
+            print cost, time
 
             #load everything
             # distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
