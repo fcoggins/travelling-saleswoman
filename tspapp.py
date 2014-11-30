@@ -109,6 +109,9 @@ def get_parameters():
         matrix = tsp.distance_matrix2(coords, id_list)
     elif mode == "roads":
         matrix = tsp.road_matrix2(coords, id_list)
+    elif mode == "airline":
+        print "Airline Data"
+        matrix = tsp.air_matrix(coords, id_list)
     else:
         return "Error"
 

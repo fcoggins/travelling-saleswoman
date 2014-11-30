@@ -230,7 +230,7 @@ function drawAnimation(animation_coords){
     $('.iterations').show();
     var i=0;
     drawAnimationFunction = setInterval(function () {
-      if($("#mode").val() == 'as_the_crow_flies'){
+      if($("#mode").val() == 'as_the_crow_flies' || $("#mode").val() == 'airline'){
         drawLine(animation_coords[i]);
       }
       else
@@ -352,7 +352,7 @@ function clear() {
 
 function stop() {
     clearInterval(drawAnimationFunction);
-    if(tour_coords && $('#mode').val() == 'as_the_crow_flies'){
+    if(tour_coords && ($('#mode').val() == 'as_the_crow_flies' || $('#mode').val() == 'airline')){
       drawLine(tour_coords);
     }
 
@@ -464,7 +464,7 @@ function handleFormSubmit(evt) {
                     title: tour_cities[0]
                   }));
 
-              if($('#mode').val() == 'as_the_crow_flies'){
+              if($('#mode').val() == 'as_the_crow_flies' || $('#mode').val() == 'airline'){
                 drawNearestNeighbor(tour_coords);
               }
               else if($('#mode').val() == 'roads'){
@@ -476,8 +476,9 @@ function handleFormSubmit(evt) {
             }
             else
             {
-              if($('#mode').val() == 'as_the_crow_flies'){
+              if($('#mode').val() == 'as_the_crow_flies' || $('#mode').val() == 'airline'){
                 drawAnimation(animation_coords);
+                console.log(animation_coords)
               }
               else if($('#mode').val() == 'roads'){
                 drawAnimation(poly_animation_steps);
@@ -626,16 +627,13 @@ function get_cities_list(){
                   $('#city_group').children('option:selected').each(function(){
                         if (data[k].id - 1 == $(this).val()){
                           unclicked = true;
-                          console.log (unclicked);
                           change_Marker_Green(k);
-                          console.log($('#city_group option[value='+$(this).val()+']'));
                           $('#city_group option[value='+$(this).val()+']').removeAttr("selected");
                         }
                         });
        
                     for (var i=0; i<select_list.length; i++){
                         if(select_list[i] == data[k].id - 1 && unclicked === false){
-                            console.log (unclicked);
                             $('#city_group option[value='+select_list[i]+']').attr("selected","selected");
                             change_Marker_Red(k);
                         }
@@ -654,7 +652,6 @@ $( "#city_group option:selected" ).each(function() {
 });
                   
 function change_Marker_Red(k){
-    console.log(markers[k]);
     markers[k].setIcon({
     path: google.maps.SymbolPath.CIRCLE,
     fillColor: '#ff530d',
