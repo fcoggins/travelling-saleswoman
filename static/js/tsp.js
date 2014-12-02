@@ -52,8 +52,8 @@ $("#select_algorithm").on("click", function(evt){
     $(".mode_class").show();
     $("#submitbutton").show();
     $(".stop_clear").show();
-    $("#next_algorithm").show();
-    $(".new_tour").show();
+    $("#next").show();
+    $("#new").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $(".mode_class").prepend('<h4>Algorithm: Nearest Neighbor</h4>');
@@ -66,8 +66,8 @@ $("#select_algorithm").on("click", function(evt){
     $(".hill_anneal").show();
     $("#submitbutton").show();
     $(".stop_clear").show();
-    $("#next_algorithm").show();
-    $(".new_tour").show();
+    $("#next").show();
+    $("#new").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $("#stop").show();
@@ -86,8 +86,8 @@ $("#select_algorithm").on("click", function(evt){
     $(".anneal").show();
     $("#submitbutton").show();
     $(".stop_clear").show();
-    $("#next_algorithm").show();
-    $(".new_tour").show();
+    $("#next").show();
+    $("#new").show();
     $("label[for='algorithm']").hide();
     $("#algorithm").hide();
     $("#stop").show();
@@ -433,7 +433,7 @@ function resetMyForm(){
     $(".stop_clear").hide();
     $("#select_algorithm").show();
     $(".mode_class").hide();
-    $("#next_algorithm").hide();
+    $("#next").hide();
     $("label[for='algorithm']").show();
     $("#algorithm").show();
     $(".mode_class > h4").remove();
