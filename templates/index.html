@@ -38,8 +38,9 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="#top">Solve</a></li>
             <li><a href="#technology">Technology</a></li>
-            <li><a href="#about">About</a></li>
+            <li><a href="#modes">Solution Modes</a></li>
             <li><a href="#algorithms">Algorithms</a></li>
+            <li><a href="#about">About</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -134,19 +135,18 @@
                     </div>
 
                 </form>
-                  
-                  <div class= "stop_clear">
+                  <div class=".btn-group" role="group">
+
                    <button id="stop" class="btn btn-default">Stop</button> 
                    <button id="clear" class="btn btn-default">Clear</button>
-                  </div>
-                  <div id="restart">
+
                   <div id="next_algorithm">
-                    <button id="next" class="btn btn-default">Try Another Algorithm</button>
+                    <button id="next" class="btn btn-default">New Algorithm</button>
                   </div>
                   <div class="new_tour">
-                    <button id="new" class="btn btn-default">Select Another Group of Cities</button>
+                    <button id="new" class="btn btn-default">New Cities</button>
                   </div> 
-                  </div> 
+                  </div>
             </div>
         </div>
 
@@ -164,7 +164,7 @@
             </div>
         </div>
         <a name="technology" id="technology"></a> 
-        <div id="#technology" class="techdiv">
+        <div id="technology" class="techdiv">
           <h1>Technology Stack</h1>
           <ul>
             <li>Google Maps API</li>
@@ -178,19 +178,39 @@
           </ul>
         </div>
 
-        <a name="about" id="about"></a> 
-        <div id="#about" class="aboutdiv">
-          <h1>About</h1>
-          <h3>Solution Modes</h3>
+        <a name="modes" id="modes"></a> 
+        <div id="modediv" class="modediv">
+          <h1>Solution Modes</h1>
           <ul>
-            <li>As the Crow Flies</li>
-            <li>Drive</li>
-            <li>Fly Commercial</li>
+            <li>As the Crow Flies
+            <p>Distance between cities is calculated using the spherical law of 
+              cosines to approximate the curvature of the earth.</p></li>
+            <li>Drive
+            <p>The Google Directions API was used to find the best route between two
+              cities. The JSON request sent latitude and longitude for the city and the
+              returned data included total road distance between the endpoints and 
+              encoded polyline data to use for drawing the route. This information was
+              stored into a SQLite database and at runtime pulled into a python shelf 
+              to improve runtime.</p></li>
+            <p>Results show total tour miles and tour cost assuming $.56 per mile to
+              drive and $30/hour for our saleswomn's time.
+            <li>Fly Commercial
+              <p>Google's QPX Express API was queried for December 15, 2014 and the 10
+                least expensive routes were returned. The cost and time for each of
+                the 10 options was stored in the SQLite database. At run time the best
+                option was selected based on the optimum combination of fare and time. This
+                weight was applied to the edges for the optimization. The distance matrix
+                in this mode is not symetric since the cost from city A to B does not necessarily
+                equal the cost from city B to A.</p>
+              <p>Total cost was calculated by adding the fares for the tour and the 
+              travel cost of $30/hour.</p>   
+            </li>
+
           </p>
         </div>
 
         <a name="algorithms" id="algorithms"></a> 
-        <div id="#algorithms" class="algorithmdiv">
+        <div id="algorithms" class="algorithmdiv">
           <h1>Algorithms</h1>
           <h3>Nearest Neighbor</h3>
           <p>Nearest neighbor simply takes the starting city and simplistically
@@ -220,6 +240,32 @@
           <p>In this implementation a better solution is always selected and a probability function
             determines whether a sub-optimal value will be accepted. The probability function starts out liberal and becomes more conservative over time, thus narrowing in on 
             a solution.</p>
+        </div>
+
+        <a name="about" id="about"></a> 
+        <div id="about" class="aboutdiv">
+          <h1>About</h1>
+          <h3>One woman's journey....</h3>
+          <p>Florie travelled (by road) cross country to come to Hackbright and round out
+            her developer skills. She lived in a small town in Georgia where she 
+            raised a family and freelanced creating websites for local small business
+            clients.</p>
+          <p>While in Georgia, she created a "Bracelet Builder" app for a client and this sparked her
+          interest in all things Javascript. Since being at Hackbright, she has come
+          to love and appreciate the "full stack" and wanted to work on a project
+          that demonstrated her love of the front end while forcing her to learn
+          about backend engineering. Thus the Travelling Saleswoman.</p>
+          <h3>The steps on the journey...</h3>
+          <ul>
+            <li>Static as-the-crow-flies solution with random points</li>
+            <li>Static as-the-crow-flies solution with cities on the map</li>
+            <li>Visualize the solution steps by introducing animation</li>
+            <li>Work with Google's direction API to get road miles and polylines</li>
+            <li>Animate the solution for road miles</li>
+            <li>Optimize to improve runtime</li>
+            <li>Add ability to select a subset of cities from a select list or by
+              clicking directly on the map</li>
+            <li>Add the Air route data</li>
         </div>
 
 
