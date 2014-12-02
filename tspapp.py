@@ -24,7 +24,7 @@ def index():
         polyline_dict = shelve.open("polyline_ref")
 
 
-    return render_template("index2.html")
+    return render_template("index.html")
 
 
 def build_file():
@@ -108,9 +108,8 @@ def get_parameters():
     if mode == "as_the_crow_flies":
         matrix = tsp.distance_matrix2(coords, id_list)
     elif mode == "roads":
-        matrix = tsp.road_matrix2(coords, id_list)
+        matrix = tsp.road_matrix(coords, id_list)
     elif mode == "airline":
-        print "Airline Data"
         matrix = tsp.air_matrix(coords, id_list)
     else:
         return "Error"

@@ -12,8 +12,26 @@ var neighborPaths = [];
 var selected_cities = [];
 var cities_string = "";
 
+
+
 $(document).ready(function () {
 google.maps.event.addDomListener(window, 'load', initialize);
+
+//make info boxes draggable
+$(function() {
+    $( "#intro" ).draggable();
+    $( "#cities" ).draggable();
+    $( "#input" ).draggable();
+    $( "#results" ).draggable();
+  });
+
+$('a').click(function(){
+    $('html, body').animate({
+        scrollTop: $( $(this).attr('href') ).offset().top
+    }, 500);
+    return false;
+});
+
 window.setTimeout(show_intro(), 100);
 $("#continue").on("click", begin);
 $("#new").on("click", new_tour);
@@ -220,7 +238,16 @@ function drawNearestNeighbor(tour_coords){
             linePath.setMap(map);
             linePaths.push(linePath);
             $('.iterations').hide();
-            $('#score').text(-best_score);//here we add the current route length
+            if($("#mode").val() == 'airline'){
+                $('#score').text("$"+ -best_score);
+                $('.cost').hide();
+            }
+            else
+            {
+                $('#score').text(-best_score + " miles");//add the current route length
+                $('.cost').show();
+                $('#cost').text("$" + (-best_score*0.56 + -best_score*30/65).toFixed(0));
+            }
             $('#route').text(cities_string);//write the route here
         }
     }, 100);
@@ -238,11 +265,12 @@ function drawAnimation(animation_coords){
         addEncodedPaths(animation_coords[i]);
       }
         $('#number').text(i+1);
-        $('#score').text(current_score[i]);//here we add the current route length
+        $('#score').text(current_score[i]);//the current route length
         i+=1;
         if (i>(animation_coords.length - 1)){
             clearInterval(drawAnimationFunction);
             $('#route').text(cities_string);//write the route here
+            $('#score').text(best_score + " miles");//the current route length
         }
     }, 100);
 }
@@ -293,7 +321,6 @@ function drawNeighborRoad(){
     var path;
     var i=0;
     var drawFunction;
-    //$("#stop").disabled = true; //stop button messes up the nearest neighbor
     drawFunction = setInterval(function () {
         path=google.maps.geometry.encoding.decodePath(polyline_best_tour[i]);
 
@@ -322,8 +349,17 @@ function drawNeighborRoad(){
             neighborPaths.push(linePath);
         }
     $('.iterations').hide();
-    $('#score').text(-best_score);//here we add the current route length
-    $('#route').text(cities_string);//write the route here
+    if($("#mode").val() == 'airline'){
+                $('#score').text("$"+ -best_score);
+                $('.cost').hide();
+            }
+            else
+            {
+                $('#score').text(-best_score + " miles");//here we add the current route length
+                $('.cost').show();
+                $('#cost').text("$" + (-best_score*0.56 + -best_score*30/65).toFixed(0));
+            }
+            $('#route').text(cities_string);//write the route here
     }, 100);
 }
 
@@ -331,6 +367,7 @@ function clear() {
     clearInterval(drawAnimationFunction);//stop the animation running
     $('#number').empty();
     $('#score').empty();
+    $('#cost').empty();
     $('#route').empty();
     iterations = 0;
     best_score = 0;
@@ -361,7 +398,7 @@ function stop() {
     }
     $('.iterations').show();
     $('#number').text(iterations);
-    $('#score').text(best_score);
+    $('#score').text(best_score + " miles");
     $('#route').text(cities_string);
 }
 
@@ -415,7 +452,7 @@ function handleFormSubmit(evt) {
         data: jsonText,
         dataType: "json",
         success: function( data ) {
-          //initialize everything
+          //initialize
             linePath.setMap(null);
             iterations = null;
             best_score = null;
@@ -427,8 +464,7 @@ function handleFormSubmit(evt) {
             clear();
             $('#results').show();
 
-            //import our data
-            //var image = data.img_file;
+            //import data
             tour_coords = data.tour_coords;
             var animation_coords = data.animation_coords;
             iterations = data.iterations;
@@ -478,7 +514,6 @@ function handleFormSubmit(evt) {
             {
               if($('#mode').val() == 'as_the_crow_flies' || $('#mode').val() == 'airline'){
                 drawAnimation(animation_coords);
-                console.log(animation_coords)
               }
               else if($('#mode').val() == 'roads'){
                 drawAnimation(poly_animation_steps);
@@ -532,14 +567,14 @@ function clear_start_city(selected_cities){
     begin();
     }
 
-    // Sets the map on all markers in the array.
+// Set all markers in the array.
 function setAllMap(map) {
   for (var i = 0; i < markers.length; i++) {
     markers[i].setMap(map);
   }
 }
 
-// Removes the markers from the map, but keeps them in the array.
+// Remove the markers from the map, but keep them in the array.
 function clearMarkers() {
   setAllMap(null);
 }
@@ -549,7 +584,7 @@ function showMarkers() {
   setAllMap(map);
 }
 
-// Deletes all markers in the array by removing references to them.
+// Delete all markers in the array by removing references to them.
 function deleteMarkers() {
   clearMarkers();
   markers = [];
@@ -682,12 +717,7 @@ function get_start_city(selected_cities){
             $('#start').html(text);
         }
 
-$(function() {
-    $( "#intro" ).draggable();
-    $( "#cities" ).draggable();
-    $( "#input" ).draggable();
-    $( "#results" ).draggable();
-  });
+
 
 
 

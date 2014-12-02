@@ -38,52 +38,33 @@ def distance_between_two_cities(lat1, lon1, lat2, lon2):
     dist = R * 2 * math.asin(math.sqrt(a)) * 0.621371 #convert to miles
     return dist
 
-# def road_matrix():
-#     '''This will pull data from our database table of 48 us cities into a matrix 
-#     to be used for tour length calculations. It will look like {(city1_id, city2_id):
-#     distance, (cityn_id, citym_id): distance, ...}.'''
-
-#     matrix = {}
-
-#     nodes = model.session.query(model.City).all()
-
-#     for i in range(len(nodes)):
-#         city1 = i + 1
-#         matrix[(i, i)] = 0
-#         for j in range(i+1, len(nodes)):           
-#             city2 = j + 1
-#             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
-#                 filter(model.Distance.city2_id == city2).first()
-#             matrix[(i, j)] = miles.road_miles
-#             matrix[(j, i)] = matrix[(i, j)]
-#     return matrix
-
-def road_matrix2(coords, id_list):
+def road_matrix(coords, id_list):
     '''This will pull data from the distance table into a matrix 
     to be used for tour length calculations. It will look like {(city1_id, city2_id):
     distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
-
+    print id_list, "id list"
     for i in range(len(id_list)):
         city1 = id_list[i]
         matrix[city1, city1] = 0
         for j in range(i+1, len(id_list)):           
             city2 = id_list[j]
+            print "city1:",city1, "city2:",city2
             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
                 filter(model.Distance.city2_id == city2).first()
-            #print i, j, miles.miles
+            print miles
             matrix[city1, city2] = miles.road_miles
             matrix[city2, city1] = matrix[city1, city2]
-    #print_nice_matrix(matrix)
     return matrix
 
 def air_matrix(coords, id_list):
-    '''Will create a matrix of edge weights based on the optimum combination of flight
-    cost and travel time.
+    '''Will create a matrix of edge weights based on the optimum combination of 
+    flight cost and travel time.
 
     Input: coords and list of selected cities.
-    Output:  dictionary like {(city1_id, city2_id):optimum edge weight, (cityn_id, citym_id): distance, ...}.
+    Output:  dictionary like {(city1_id, city2_id):optimum edge weight, 
+    (cityn_id, citym_id): distance, ...}.
 
     Formula for calculating edge weight is min(flight cost + travel time/60 * 30)
 
@@ -98,14 +79,33 @@ def air_matrix(coords, id_list):
             city2 = id_list[j]
             if city1 == city2:
                 continue
-
+            edge_weight = []
             result = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
                 filter(model.Distance.city2_id == city2).first()
-            edge_weight = result.cost1 + result.time1/2
+
+            add_edge_weight(edge_weight, result.cost1, result.time1)
+            add_edge_weight(edge_weight, result.cost2, result.time2)
+            add_edge_weight(edge_weight, result.cost3, result.time3)
+            add_edge_weight(edge_weight, result.cost4, result.time4)
+            add_edge_weight(edge_weight, result.cost5, result.time5)
+            add_edge_weight(edge_weight, result.cost6, result.time6)
+            add_edge_weight(edge_weight, result.cost7, result.time7)
+            add_edge_weight(edge_weight, result.cost8, result.time8)
+            add_edge_weight(edge_weight, result.cost9, result.time9)
+            add_edge_weight(edge_weight, result.cost10, result.time10)
+
             #print i, j, miles.miles
-            matrix[city1, city2] = edge_weight
-    print_nice_matrix(matrix, id_list)
+            if edge_weight:
+                matrix[city1, city2] = min(edge_weight)#minimum of the ten options
+            else:
+                matrix[city1, city2] = 500 #No flights...(Topeka, Trenton)
+
     return matrix
+
+def add_edge_weight(edge_weight, cost1, time1):
+    if cost1:
+        edge_weight.append(cost1 + time1/2)
+    return edge_weight
 
 def print_nice_matrix(matrix, id_list):
     '''Print a nice distance matrix that is readable by humans. Used for debugging'''

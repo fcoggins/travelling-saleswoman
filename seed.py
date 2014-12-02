@@ -97,7 +97,7 @@ def load_directions(session):
 def read_directions_files(session):
 
     nodes = model.session.query(model.City).all()
-    #distance = model.session.query(model.Distance).all()
+
     #loop through the cities in nodes and extract the city name to grab the file
     for i in range(len(nodes)):
         city1 = nodes[i].city
@@ -108,7 +108,7 @@ def read_directions_files(session):
             if city1 == city2 or airport1 == airport2:
                 continue
 
-            #read road data in
+            #read road data
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
             filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
@@ -119,7 +119,7 @@ def read_directions_files(session):
             leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
             leg_polyline = data["routes"][0]["overview_polyline"]["points"]
 
-            #read airline data in
+            #read airline data
             filename = "airline_data/"+city1_underscore+'-'+city2_underscore+".json"
             print filename
             f = open(filename)
@@ -134,6 +134,11 @@ def read_directions_files(session):
                 time[str(k)]=None
             if data['trips'].get('tripOption') == None:
                     print "No Data"
+                    distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
+                    road_miles = leg_miles, polyline = leg_polyline, cost1 = cost['0'],cost2 = cost['1'],cost3= cost['2'],
+                    cost4= cost['3'],cost5= cost['4'],cost6= cost['5'],cost7= cost['6'],cost8= cost['7'],cost9= cost['8'],cost10=cost['9'], time1=time['0'], time2=time['1'], time3=time['2'],
+                    time4=time['3'], time5=time['4'], time6=time['5'], time7=time['6'], time8=time['7'], time9=time['8'], time10=time['9'])
+                    session.add(distance)
                     continue
             num_options = len(data['trips']['tripOption'])
             for k in range(num_options):
@@ -162,26 +167,6 @@ def load_cities(session):
             city = model.City(city=row[1], state=row[0], lat=row[2], longitude=row[3], capital=row[4], airport_code=row[5])
             session.add(city)
     session.commit()
-
-# def load_distance(session):
-#     """loop through all the cities in the cities table and calculate the distance
-#     between them and insert into the matrix.
-#     """
-#     nodes = model.session.query(model.City).all()
-#     for i in range(len(nodes)):
-#         for j in range(i+1, len(nodes)):
-#             dist = tsp.distance_between_two_cities(nodes[i].lat, nodes[i].longitude,
-#              nodes[j].lat, nodes[j].longitude)
-#             # dist_object = model.Distance.query.filter_by(model.Distance.city1_id=i, model.Distance.city2_id=j).one()
-#             dist_object = model.session.query(model.Distance).filter_by(city1_id=i,city2_id=j).first()
-#             if dist_object:
-#                 print "i is", i
-#                 print "j is", j
-#                 dist_object.miles = dist
-#                 print dist_object.miles
-#                 session.add(dist_object)
-#     session.commit()
-#     session.close()
 
 def main(session):
 

@@ -1,50 +1,225 @@
 <html>
 <head>
-    <title>TSP visualization</title>
+    <title>The Travelling Saleswoman</title>
+    <!-- Bootstrap -->
+   
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="static/dist/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="static/js/jquery-ui-1.11.2.custom/jquery-ui.theme.min.css"-->
+
+    <!-- Optional theme -->
+    <!--<link rel="stylesheet" href="static/dist/css/bootstrap-theme.min.css">-->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
 </head>
 <body>
-    <h1>Results with simple Hill Climb Algorithm</h1>
-    <img src="" id = "plot">
+    <a name="top" id="top"></a> 
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" 
+          data-toggle="collapse" data-target="#navbar" aria-expanded="false" 
+          aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">the travelling SalesWoman</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#top">Solve</a></li>
+            <li><a href="#technology">Technology</a></li>
+            <li><a href="#about">About</a></li>
+            <li class="dropdown">
+              <a href="#algorithms" class="dropdown-toggle" data-toggle="dropdown">Algorithms<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#nearest">Nearest Neighbor</a></li>
+                <li><a href="#hillclimb">Hillclimb</a></li>
+                <li><a href="#sa">Simulated Annealing</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <!--<div class="jumbotron">-->
+        <div id="map-canvas" class="map"></div>
+    <!--</div>-->
 
-    <div class = "right">
-        <div class = "user_input">
-        <h2>Input</h2>
-        <form id="userinput">
-            <label for="data">Data set</label>
-            <select id="data" name="data">
-                <option value="GMdata">Map data from Google Maps</option>
-                <option value="cities10.txt">10 US cities</option>
-                <option value="cities48.txt">48 US cities</option>
-            </select>
-            <br>
-            <label for="scaling">Scaling factor</label>
-            <input type="text" id="scaling" name="scaling" value = "0.09">
-            <br>
-            <label for="algorithm">Algorithm</label>
-            <select id="algorithm" name="algorithm">
-                <option value="hillclimb">Basic Hillclimb</option>
-                <option value="hillclimb and restart">Hillclimb and restart</option>
-            </select>
-            <br>
-            <label for="cycles">Max. iterations</label>
-            <input type="text" id="cycles" name="cycles" value = "100">
-            <br>
-            <button type="submit" id="submitbutton">Give it a spin<submit>
-        </form>
+          <div class="panel panel-primary intro" id="intro">
+            <div class="panel-heading">
+              <h3 class="panel-title">The Problem</h3>
+            </div>
+            <div class="panel-body">
+              <p>How can you most economically travel a route between a number of cities, such that you visit each city exactly one time?</p>
+              <p>Though there is no exact mathematical solution for this problem, 
+                there are many algorithms that give acceptable results. Explore some of those solutions here.</p>
+             <button id="continue" class="btn btn-default">Continue</button> 
+            </div>
         </div>
 
-        <div class = "results">
-        <h2>Results</h2>
-        <h3>Number of iterations = <span id = "number"></span> </h3>
-        <h3>Best Score = <span id = "score"></span></h3>
-        <h3>Best Route = <span id = "route"></span></h3>
+         <div class="panel panel-primary cities" id="cities">
+            <div class="panel-heading">
+              <h3 class="panel-title">Cities</h3>
+            </div>
+            <div class="panel-body">
+              <p>Click on the map to select cities or select from the dropdown.</p>
+              <form id="cityinput">
+                <div class="form-group">
+              <select multiple="multiple" id="city_group" name="city_group" size="10" class="form-control">
+              </select>
+                </div>
+              <button id="drop" type="submit" class="btn btn-default">Select</button>
+              </form>
+            </div>
         </div>
+
+        <div class="panel panel-primary user_input" id="input">
+            <div class="panel-heading">
+              <h3 class="panel-title">Input</h3>
+            </div>
+            <div class="panel-body">
+                <form id="userinput" >                   
+                    <div class="form-group">
+                    <label for="algorithm">Algorithm:</label>
+                    <select id="algorithm" name="algorithm">
+                        <option value="nearest">Nearest Neighbor</option>
+                        <option value="hillclimb">Basic Hillclimb</option>
+                        <option value="hill_restart">Hillclimb & Restart</option>  
+                        <option value="annealing">Simulated Annealing</option>
+                    </select>
+                    <button id="select_algorithm" class="btn btn-default">Select</button>
+                  </div>
+
+
+                    <div class = "mode_class">
+                    <label for="mode">Mode:</label>
+                    <select id="mode" name="mode">
+                        <option value="as_the_crow_flies">As the crow flies</option>
+                        <option value="roads">Road distance</option>
+                        <option value="airline">Airline cost</option>
+                    </select>
+                    </div>
+                    
+
+                    <div class = "nearest_neighbor">
+                    <label for="start">Start City:</label>
+                    <select id="start" name="start">
+                    </select>
+                    </div>
+                    
+                    <div class = "hill_anneal">
+                    <label for="move_operator">Move Operator:</label>
+                    <select id="move_operator" name="move_operator">
+                        <option value="swapped_cities">Swap Cities</option>
+                        <option value="reversed_sections">Swap Edges</option>
+                    </select>
+                    <br>
+                    <label for="cycles">Maximum trys:</label>
+                    <input type="text" id="cycles" name="cycles" value = "100" size="10">
+                    </div>
+
+                    <div class = "anneal">
+                    <label for="start_temp">Start Temp:</label>
+                    <input type="text" id="start_temp" name="start_temp" value = "10" size="10">
+                    <br>
+                    <label for="alpha">alpha (&lt;1):</label>
+                    <input type="text" id="alpha" name="alpha" value = ".5" size="10">
+                    </div>
+
+                    <div class = "button">
+                    <button type="submit" id="submitbutton" class="btn btn-default">Start</button>
+                    </div>
+
+                </form>
+                  
+                  <div class= "stop_clear">
+                   <button id="stop" class="btn btn-default">Stop</button> 
+                   <button id="clear" class="btn btn-default">Clear</button>
+                  </div>
+                  <div id="restart">
+                  <div id="next_algorithm">
+                    <button id="next" class="btn btn-default">Try Another Algorithm</button>
+                  </div>
+                  <div class="new_tour">
+                    <button id="new" class="btn btn-default">Select Another Group of Cities</button>
+                  </div> 
+                  </div> 
+            </div>
+        </div>
+
+
+
+        <div class="panel panel-primary results" id="results">
+            <div class="panel-heading">
+              <h3 class="panel-title">Results</h3>
+            </div>
+            <div class="panel-body">
+              <h5 class="iterations">Number of iterations = <span id = "number"></span></h5>
+              <h5>Result: <span id = "score"></span></h5>
+              <h5 class="cost">Cost: <span id = "cost"></span></h5>
+              <h5>Route: <span id = "route"></span></h5>
+            </div>
+        </div>
+        <a name="technology" id="technology"></a> 
+        <div id="#technology" class="techdiv">
+          <h1>Technology Stack</h1>
+          <ul>
+            <li>Google Maps API</li>
+            <li>Google Directions API - for road data</li>
+            <li>QPX Express API - airfares and flight durations</li>
+            <li>SQLite and SQLAlchemy</li>
+            <li>Python</li>
+            <li>Flask</li>
+            <li>Javascript/JQuery/JQuery UI</li>
+            <li>HTML/CSS/Bootstrap</li>
+          </ul>
+        </div>
+
+        <a name="about" id="about"></a> 
+        <div id="#about" class="aboutdiv">
+          <h1>About</h1>
+          <p>Florie came west to Hackbright from a small town in Georgia where...
+          </p>
+        </div>
+
+        <a name="algorithms" id="algorithms"></a> 
+        <div id="#algorithms" class="algorithmdiv">
+          <h1>Algorithms</h1>
+          <p>Solutions to the Travelling Salesman Problem are considered...
+          </p>
+          <h2>Nearest Neighbor</h2>
+          <p>The most simple of the algorithms....</p>
+          <h2>Hillclimb</h2>
+          <p>Random solution with a two opt swap....</p>
+          <h2>Simulated Annealing</h2>
+          <p>Use a probability function....</p>
+        </div>
+
+
+    <div class="footer">
+      <div class="container">
+        <p class="text-muted">&copy;2014 Florinda Bustamante Coggins</p>
+      </div>
     </div>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="static/js/jquery-ui-1.11.2.custom/jquery-ui.js"></script>
+<script src="static/dist/js/bootstrap.min.js"></script>
 <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZIoOX8afLsDVhpqC788YraO1ApQLwwcg">
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZIoOX8afLsDVhpqC788YraO1ApQLwwcg">
 </script>
+<script src="/static/js/markerwithlabel.js"></script>
+<!--<script src="/static/js/gmapi.js"></script>-->
 <script src="/static/js/tsp.js"></script>
 </body>
 </html>
