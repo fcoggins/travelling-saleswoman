@@ -32,21 +32,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">the travelling SalesWoman</a>
+          <a class="navbar-brand" href="#">the travelling salesWoman</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#top">Solve</a></li>
             <li><a href="#technology">Technology</a></li>
             <li><a href="#about">About</a></li>
-            <li class="dropdown">
-              <a href="#algorithms" class="dropdown-toggle" data-toggle="dropdown">Algorithms<span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#nearest">Nearest Neighbor</a></li>
-                <li><a href="#hillclimb">Hillclimb</a></li>
-                <li><a href="#sa">Simulated Annealing</a></li>
-              </ul>
-            </li>
+            <li><a href="#algorithms">Algorithms</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -104,9 +97,9 @@
                     <div class = "mode_class">
                     <label for="mode">Mode:</label>
                     <select id="mode" name="mode">
-                        <option value="as_the_crow_flies">As the crow flies</option>
-                        <option value="roads">Road distance</option>
-                        <option value="airline">Airline cost</option>
+                        <option value="as_the_crow_flies">As the Crow Flies</option>
+                        <option value="roads">Drive</option>
+                        <option value="airline">Fly</option>
                     </select>
                     </div>
                     
@@ -124,7 +117,7 @@
                         <option value="reversed_sections">Swap Edges</option>
                     </select>
                     <br>
-                    <label for="cycles">Maximum trys:</label>
+                    <label for="cycles">Maximum Tries:</label>
                     <input type="text" id="cycles" name="cycles" value = "100" size="10">
                     </div>
 
@@ -188,21 +181,45 @@
         <a name="about" id="about"></a> 
         <div id="#about" class="aboutdiv">
           <h1>About</h1>
-          <p>Florie came west to Hackbright from a small town in Georgia where...
+          <h3>Solution Modes</h3>
+          <ul>
+            <li>As the Crow Flies</li>
+            <li>Drive</li>
+            <li>Fly Commercial</li>
           </p>
         </div>
 
         <a name="algorithms" id="algorithms"></a> 
         <div id="#algorithms" class="algorithmdiv">
           <h1>Algorithms</h1>
-          <p>Solutions to the Travelling Salesman Problem are considered...
-          </p>
-          <h2>Nearest Neighbor</h2>
-          <p>The most simple of the algorithms....</p>
-          <h2>Hillclimb</h2>
-          <p>Random solution with a two opt swap....</p>
-          <h2>Simulated Annealing</h2>
-          <p>Use a probability function....</p>
+          <h3>Nearest Neighbor</h3>
+          <p>Nearest neighbor simply takes the starting city and simplistically
+            travels to the next available city. The process is repeated until the
+            possibilities are exhausted and the loop is closed. This solution more
+            often then not is far from optimum.</p>
+          <h3>Hillclimb</h3>
+          <p>Hillclimb explores neighboring solution states by employing a move
+            operator. An initial random solution is found and then a neighboring
+            state is evaluated. If the neighbor state results in a better solution
+            then it is accepted and the process is repeated until no better solutions
+            can be found.</p>
+          <p>The choice of move operator determines the neighbor state:
+            <ul>
+              <li>Swap cities - the order of two successive cities is reversed.</li>
+              <li>Swap edges - two edges are disconnected and reconnected to the 
+                other's endpoints.</li>
+            </ul>
+          <p>The problem with the simple Hillclimb is that there may exist many local
+            maxima that are not the global maxima. The Hillclimb method can get stuck
+            at one of these. The method can be run repeatedly up to a specified number
+            of tries a more sophisticated method can be used such as...
+          <h3>Simulated Annealing</h3>
+          <p>In order to avoid the problem of local maxima, SA will temporarily accept 
+            less than optimal solutions. A probability function that decreases over time
+            determines whether less than optimal solutions are chosen.</p>
+          <p>In this implementation a better solution is always selected and a probability function
+            determines whether a sub-optimal value will be accepted. The probability function starts out liberal and becomes more conservative over time, thus narrowing in on 
+            a solution.</p>
         </div>
 
 

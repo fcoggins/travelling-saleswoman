@@ -304,7 +304,7 @@ def P(prev_score,next_score,temperature):
     function will select solutions closer to the current solution with a high 
     probability. Temperature is used to vary the probability. At higher temperatures,
     probability will be higher. At lower temperature, as the function cools,
-    probabilities are lower.
+    probabilities are lower. return e**(difference in scores/temp)
     '''
 
     if next_score > prev_score:

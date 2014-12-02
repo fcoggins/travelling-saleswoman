@@ -270,7 +270,17 @@ function drawAnimation(animation_coords){
         if (i>(animation_coords.length - 1)){
             clearInterval(drawAnimationFunction);
             $('#route').text(cities_string);//write the route here
-            $('#score').text(best_score + " miles");//the current route length
+            //$('#score').text(best_score + " miles");//the current route length
+            if($("#mode").val() == 'airline'){
+                $('#score').text("$"+ best_score);
+                $('.cost').hide();
+            }
+            else
+            {
+                $('#score').text(best_score + " miles");//add the current route length
+                $('.cost').show();
+                $('#cost').text("$" + (best_score*0.56 + best_score*30/65).toFixed(0));
+            }
         }
     }, 100);
 }
@@ -398,8 +408,18 @@ function stop() {
     }
     $('.iterations').show();
     $('#number').text(iterations);
-    $('#score').text(best_score + " miles");
+    //$('#score').text(best_score + " miles");
     $('#route').text(cities_string);
+    if($("#mode").val() == 'airline'){
+                $('#score').text("$"+ best_score);
+                $('.cost').hide();
+            }
+            else
+            {
+                $('#score').text(best_score + " miles");//add the current route length
+                $('.cost').show();
+                $('#cost').text("$" + (best_score*0.56 + best_score*30/65).toFixed(0));
+            }
 }
 
 function resetMyForm(){
