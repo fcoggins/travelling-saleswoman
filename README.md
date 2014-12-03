@@ -23,7 +23,7 @@ utilizing Directions from Google Directions API and Flight data from Google's QP
 <li>model.py</li>
 <li>tsp.py: calculate distance matrix, solution algorithms</li>
 <li>tspapp.py: controls the Flask app</li>
-<li>tsp.js: user interactions</li>
+<li>static/js/tsp.js: user interactions</li>
 </ul>
 
 
