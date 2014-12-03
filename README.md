@@ -1,7 +1,7 @@
 <h1>The Travelling Saleswoman</h1>
 <hr>
 <p>The Travelling Saleswoman provides a tool to visualize the classic computer science travelling 
-salesman optimization problem. This visualization tool provides the ability a solution for a user-selected 
+salesman optimization problem. This visualization tool provides the ability to select a 
 subset of US cities. Choices of "Nearest Neighbor", "Hillclimb" and "Simulated Annealing" algorithms allow comparisons
 of various solution methods. Solution modes include "As-the-crow-flies", "Drive", or "Fly" with the latter two modes
 utilizing Directions from Google Directions API and Flight data from Google's QPX Express API.</p>
