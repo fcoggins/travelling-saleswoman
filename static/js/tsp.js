@@ -12,8 +12,6 @@ var neighborPaths = [];
 var selected_cities = [];
 var cities_string = "";
 
-
-
 $(document).ready(function () {
 google.maps.event.addDomListener(window, 'load', initialize);
 
