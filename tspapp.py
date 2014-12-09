@@ -38,7 +38,7 @@ def build_file():
             value = distance[i].polyline
             polyline_dict[key]=value
     time2 = time.time()
-    print "Cost to build table", (time2-time1)
+    # print "Cost to build table", (time2-time1)
 
 
 @app.route("/get_initial_data", methods=['GET'])
@@ -210,8 +210,8 @@ def poly_line_tour2(best):
         
         poly_list.append(polyline)
     step_out = time.time()
-    print "returning each polyline tour2", (step_out - step_in)
-    print "total data call =", total_data_call
+    # print "returning each polyline tour2", (step_out - step_in)
+    # print "total data call =", total_data_call
     return (poly_list, total_data_call)
 
 def polyline_animation_steps(animation_steps):
@@ -241,7 +241,7 @@ def polyline_animation_steps2(animation_steps):
         line, data = poly_line_tour2(animation_steps[i])
         poly_animation_steps.append(line)
         total += data
-    print total, "for getting data out of database"
+    # print total, "for getting data out of database"
     return poly_animation_steps
 
 if __name__ == "__main__":

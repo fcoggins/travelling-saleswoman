@@ -44,16 +44,13 @@ def road_matrix(coords, id_list):
     distance, (cityn_id, citym_id): distance, ...}.'''
 
     matrix = {}
-    print id_list, "id list"
     for i in range(len(id_list)):
         city1 = id_list[i]
         matrix[city1, city1] = 0
         for j in range(i+1, len(id_list)):           
             city2 = id_list[j]
-            print "city1:",city1, "city2:",city2
             miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
                 filter(model.Distance.city2_id == city2).first()
-            print miles
             matrix[city1, city2] = miles.road_miles
             matrix[city2, city1] = matrix[city1, city2]
     return matrix
@@ -94,7 +91,6 @@ def air_matrix(coords, id_list):
             add_edge_weight(edge_weight, result.cost9, result.time9)
             add_edge_weight(edge_weight, result.cost10, result.time10)
 
-            #print i, j, miles.miles
             if edge_weight:
                 matrix[city1, city2] = min(edge_weight)#minimum of the ten options
             else:
