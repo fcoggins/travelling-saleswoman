@@ -248,4 +248,5 @@ def polyline_animation_steps2(animation_steps):
 if __name__ == "__main__":
 
     PORT = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=PORT)  
+    DEBUG = "NO_DEBUG" not in os.environ
+    app.run(debug=DEBUG, host="0.0.0.0", port=PORT)  
