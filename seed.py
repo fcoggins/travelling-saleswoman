@@ -52,25 +52,12 @@ def load_flight_data(session):
             f.close()
 
 
-
-
-
-
-    # data = '{"nw_src": "10.0.0.1/32", "nw_dst": "10.0.0.2/32", "nw_proto": "ICMP", "actions": "ALLOW", "priority": "10"}'
-    # req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
-    # f = urllib2.urlopen(req)
-    # for x in f:
-    # print(x)
-    # f.close()
-
-
-
 def load_directions(session):
 
-    api_key = credentials.API_KEY_2
+    api_key = credentials.API_KEY
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     nodes = model.session.query(model.City).all()
-    for i in range(1, 59):
+    for i in range(59, len(nodes)):
         city1 = nodes[i].city
         state1 = nodes[i].state
         city1_escaped = (city1 + "," + state1).replace(" ", "%20")
@@ -80,7 +67,7 @@ def load_directions(session):
             state2 = nodes[j].state
             city2_escaped = (city2 + "," + state2).replace(" ", "%20")
             city2_underscore = city2.replace(" ", "_")
-            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
+            filename = "directions3/"+city1_underscore+'-'+city2_underscore+".json"
             print filename
             parameters = 'origin='+city1_escaped+'&destination='+city2_escaped+'&key='
             request = Request(url + parameters + api_key)
@@ -170,8 +157,8 @@ def load_cities(session):
 
 def main(session):
 
-    read_directions_files(session)
-    #load_directions(session)
+    #read_directions_files(session)
+    load_directions(session)
     #load_distance(session)
     #load_cities(session)
     #load_flight_data(session)
