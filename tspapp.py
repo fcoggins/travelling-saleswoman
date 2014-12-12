@@ -203,8 +203,7 @@ def poly_line_tour2(best):
         lookup_string = str(city1)+'-'+str(city2)
         #This may be why it is running slow. Hard code? Change database??
         before_data_call = time.time()
-        polyline = polyline_dict[lookup_string]
-        
+        polyline = polyline_dict[lookup_string]        
         after_data_call = time.time()
         total_data_call += (-before_data_call+after_data_call)
         

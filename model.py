@@ -4,8 +4,9 @@ from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
+import psycopg2
 
-engine = create_engine("sqlite:///tsp.db", echo = False)
+engine = create_engine("postgresql:///tsp", echo = False)
 session = scoped_session(sessionmaker(bind=engine, autocommit = False, autoflush = False))
 
 Base = declarative_base()
@@ -59,7 +60,7 @@ def connect():
     global ENGINE
     global Session
 
-    ENGINE = create_engine("sqlite:///tsp.db", echo = True)
+    ENGINE = create_engine("postgresql:///tsp", echo = True)
     Session = sessionmaker(bind=ENGINE)
     Base.metadata.create_all(ENGINE)
 

@@ -9,11 +9,11 @@ def load_flight_data(session):
     api_key = credentials.API_KEY
     url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key='+api_key
     nodes = model.session.query(model.City).all()
-    for i in range (0, 1):
+    for i in range (24, 25):
         code1 = nodes[i].airport_code
         city1 = nodes[i].city.replace(" ", "_")
         print city1
-        for j in range (52, len(nodes)):
+        for j in range (19, 20):
             code2 = nodes[j].airport_code
             city2 = nodes[j].city.replace(" ", "_")
             print city2
@@ -57,7 +57,7 @@ def load_directions(session):
     api_key = credentials.API_KEY
     url = 'https://maps.googleapis.com/maps/api/directions/json?'
     nodes = model.session.query(model.City).all()
-    for i in range(59, len(nodes)):
+    for i in range(53, 54):
         city1 = nodes[i].city
         state1 = nodes[i].state
         city1_escaped = (city1 + "," + state1).replace(" ", "%20")
@@ -92,13 +92,13 @@ def read_directions_files(session):
         for j in range(len(nodes)):
             city2 = nodes[j].city
             airport2 = nodes[j].airport_code
-            if city1 == city2 or airport1 == airport2:
+            if city1 == city2 or airport1 == airport2 or (city1 == 'Olympia' and city2 == 'Seattle') or (city1 == 'Seattle' and city2 == 'Olympia') :
                 continue
 
             #read road data
             city1_underscore = city1.replace (" ", "_")
             city2_underscore = city2.replace (" ", "_")
-            filename = "directions2/"+city1_underscore+'-'+city2_underscore+".json"
+            filename = "directions3/"+city1_underscore+'-'+city2_underscore+".json"
             f = open(filename)
             jsondata = f.read()
             data = json.loads(jsondata)
@@ -144,6 +144,47 @@ def read_directions_files(session):
             session.add(distance)
     session.commit()
 
+def read_directions_files_same_airport(session):
+    '''insert data where airports are the same'''
+
+    nodes = model.session.query(model.City).all()
+
+    #loop through the cities in nodes and extract the city name to grab the file
+    for i in range(64, 65):
+        city1 = nodes[i].city
+        #airport1 = nodes[i].airport_code
+        for j in range(47, 48):
+            city2 = nodes[j].city
+            #airport2 = nodes[j].airport_code
+
+            print city1, city2
+            #read road data
+            city1_underscore = city1.replace (" ", "_")
+            city2_underscore = city2.replace (" ", "_")
+            filename = "directions3/"+city1_underscore+'-'+city2_underscore+".json"
+            f = open(filename)
+            jsondata = f.read()
+            data = json.loads(jsondata)
+            f.close()
+            leg_miles = data["routes"][0]["legs"][0]["distance"]["value"] * 0.000621371
+            leg_polyline = data["routes"][0]["overview_polyline"]["points"]
+
+            cost = {}
+            time = {}
+            for k in range(10):
+                cost[str(k)]=None
+                time[str(k)]=None
+            print cost['0'], time['0']
+
+            #load everything
+            distance = model.Distance( city1_id = nodes[i].id, city2_id = nodes[j].id, 
+                road_miles = leg_miles, polyline = leg_polyline, cost1 = cost['0'],cost2 = cost['1'],cost3= cost['2'],
+                cost4= cost['3'],cost5= cost['4'],cost6= cost['5'],cost7= cost['6'],cost8= cost['7'],cost9= cost['8'],cost10=cost['9'], time1=time['0'], time2=time['1'], time3=time['2'],
+                time4=time['3'], time5=time['4'], time6=time['5'], time7=time['6'], time8=time['7'], time9=time['8'], time10=time['9'])           
+
+            session.add(distance)
+    session.commit()
+
 
 
 def load_cities(session):
@@ -158,7 +199,8 @@ def load_cities(session):
 def main(session):
 
     #read_directions_files(session)
-    load_directions(session)
+    #read_directions_files_same_airport(session)
+    #load_directions(session)
     #load_distance(session)
     #load_cities(session)
     #load_flight_data(session)
