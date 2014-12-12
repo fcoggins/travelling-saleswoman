@@ -4,9 +4,11 @@ from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
-import psycopg2
+import psycopg2, os
 
-engine = create_engine("postgresql:///tsp", echo = False)
+
+DATABASE_URL = os.environ.get("DATABASE_URL","postgresql:///tsp")
+engine = create_engine(DATABASE_URL, echo = False)
 session = scoped_session(sessionmaker(bind=engine, autocommit = False, autoflush = False))
 
 Base = declarative_base()
@@ -60,7 +62,8 @@ def connect():
     global ENGINE
     global Session
 
-    ENGINE = create_engine("postgresql:///tsp", echo = True)
+    DATABASE_URL = os.environ.get("DATABASE_URL","postgresql:///tsp")
+    ENGINE = create_engine(DATABASE_URL, echo = True)
     Session = sessionmaker(bind=ENGINE)
     Base.metadata.create_all(ENGINE)
 
