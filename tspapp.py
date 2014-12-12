@@ -190,8 +190,7 @@ def poly_line_tour(best):
 
 def poly_line_tour2(best):
     '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
-    which is a list of polylines [line1, line2 .... linex] for 48 cities best
-    includes each of the nodes from 0 to 47 once.'''
+    which is a list of polylines [line1, line2 .... linex].'''
     total_data_call = 0
     poly_list = []
     global polyline_dict
@@ -201,7 +200,6 @@ def poly_line_tour2(best):
         city1 = best[i]
         city2 = best[(i+1)%len(best)]
         lookup_string = str(city1)+'-'+str(city2)
-        #This may be why it is running slow. Hard code? Change database??
         before_data_call = time.time()
         polyline = polyline_dict[lookup_string]        
         after_data_call = time.time()
