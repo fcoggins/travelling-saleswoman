@@ -24,9 +24,7 @@ def index():
     else:
         polyline_dict = shelve.open("polyline_ref")
 
-
     return render_template("index.html")
-
 
 def build_file():
 
