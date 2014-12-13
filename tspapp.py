@@ -21,14 +21,6 @@ def index():
     global build_dict_thread
     build_dict_thread = threading.Thread(target=build_file)
     build_dict_thread.start()
-    #build_file()
-
-    # if not os.path.isfile("polyline_ref.db"):
-    #     polyline_dict = shelve.open("polyline_ref")
-    #     build_file()
-    # else:
-    #     polyline_dict = shelve.open("polyline_ref")
-
     return render_template("index.html")
 
 def build_file():
@@ -154,7 +146,7 @@ def get_parameters():
 
     tour_cities = convert_tour_to_city(best)
 
-    if mode == "roads" and  not build_dict_thread.isAlive():
+    if mode == "roads" and not build_dict_thread.isAlive():
         poly_list, data = poly_line_tour2(best)
         poly_animation_steps = polyline_animation_steps2(animation_steps)
     else:
