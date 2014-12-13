@@ -1,6 +1,6 @@
 from flask import Flask, request, session as fsksession, render_template, g, redirect, url_for, flash
 import os, jinja2, random, string, json, sys
-import tsp, model, time, shelve
+import tsp, model, time, shelve, threading
 #import credentials
 
 app = Flask(__name__)
@@ -9,6 +9,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", '\xf5!\x07!qj\xa4\x08\xc6\xf
 app.jinja_env.undefined = jinja2.StrictUndefined
 
 polyline_dict = {}
+build_dict_thread = None
 
 @app.route("/")
 def index():
@@ -17,12 +18,16 @@ def index():
     the polyline."""
     
     global polyline_dict
+    global build_dict_thread
+    build_dict_thread = threading.Thread(target=build_file)
+    build_dict_thread.start()
+    #build_file()
 
-    if not os.path.isfile("polyline_ref.db"):
-        polyline_dict = shelve.open("polyline_ref")
-        build_file();
-    else:
-        polyline_dict = shelve.open("polyline_ref")
+    # if not os.path.isfile("polyline_ref.db"):
+    #     polyline_dict = shelve.open("polyline_ref")
+    #     build_file()
+    # else:
+    #     polyline_dict = shelve.open("polyline_ref")
 
     return render_template("index.html")
 
@@ -37,7 +42,7 @@ def build_file():
             value = distance[i].polyline
             polyline_dict[key]=value
     time2 = time.time()
-    # print "Cost to build table", (time2-time1)
+    print "Cost to build table", (time2-time1)
 
 
 @app.route("/get_initial_data", methods=['GET'])
@@ -70,7 +75,7 @@ def get_cities_data():
 
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
-
+    global build_dict_thread
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
     start_temp = float(request.form['start_temp'])
@@ -149,7 +154,7 @@ def get_parameters():
 
     tour_cities = convert_tour_to_city(best)
 
-    if mode == "roads":
+    if mode == "roads" and  not build_dict_thread.isAlive():
         poly_list, data = poly_line_tour2(best)
         poly_animation_steps = polyline_animation_steps2(animation_steps)
     else:
