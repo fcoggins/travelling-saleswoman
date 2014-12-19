@@ -31,6 +31,16 @@ $('a').click(function(){
     return false;
 });
 
+//change header opacity on scrolling
+$( window ).scroll(function() {
+  var st = $(this).scrollTop();
+  console.log(st);
+  var o = (0.2 + st/800).toString();
+  console.log("string", o)
+  $( ".navbar-inverse" ).css( "background-color", "rgba(153, 174, 173," + o + ")" );
+});
+
+
 window.setTimeout(show_intro(), 100);
 $("#continue").on("click", begin);
 $("#new").on("click", new_tour);
