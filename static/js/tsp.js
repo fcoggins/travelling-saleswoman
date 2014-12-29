@@ -23,6 +23,8 @@ $(function() {
     $( "#results" ).draggable();
   });
 
+
+
 //scrolling for web pages
 $('a').click(function(){
     $('html, body').animate({
@@ -34,9 +36,7 @@ $('a').click(function(){
 //change header opacity on scrolling
 $( window ).scroll(function() {
   var st = $(this).scrollTop();
-  console.log(st);
   var o = (0.2 + st/800).toString();
-  console.log("string", o)
   $( ".navbar-inverse" ).css( "background-color", "rgba(153, 174, 173," + o + ")" );
 });
 
