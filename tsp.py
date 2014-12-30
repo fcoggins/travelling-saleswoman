@@ -38,7 +38,7 @@ def distance_between_two_cities(lat1, lon1, lat2, lon2):
     dist = R * 2 * math.asin(math.sqrt(a)) * 0.621371 #convert to miles
     return dist
 
-def road_matrix(coords, id_list):
+def road_matrix(polyline_dict, id_list):
     '''This will pull data from the distance table into a matrix 
     to be used for tour length calculations. It will look like {(city1_id, city2_id):
     distance, (cityn_id, citym_id): distance, ...}.'''
@@ -49,9 +49,11 @@ def road_matrix(coords, id_list):
         matrix[city1, city1] = 0
         for j in range(i+1, len(id_list)):           
             city2 = id_list[j]
-            miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
-                filter(model.Distance.city2_id == city2).first()
-            matrix[city1, city2] = miles.road_miles
+            #miles = model.session.query(model.Distance).filter(model.Distance.city1_id == city1).\
+                #filter(model.Distance.city2_id == city2).first()
+            key = str(city1)+"-"+str(city2)
+            miles = polyline_dict[key][1]
+            matrix[city1, city2] = miles
             matrix[city2, city1] = matrix[city1, city2]
     return matrix
 

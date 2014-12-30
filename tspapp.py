@@ -30,7 +30,7 @@ def build_file():
     time1 = time.time()
     for i in range(len(distance)):
         key = str(distance[i].city1_id)+"-"+str(distance[i].city2_id)
-        value = distance[i].polyline
+        value = [distance[i].polyline, distance[i].road_miles]
         polyline_dict[key]=value
     time2 = time.time()
     print "Cost to build table", (time2-time1)
@@ -66,7 +66,7 @@ def get_cities_data():
 
 @app.route("/userinput", methods=['POST'])
 def get_parameters():
-    global build_dict_thread
+    global build_dict_thread, polyline_dict
     cycles = int(request.form['cycles'])
     algorithm = request.form['algorithm']
     start_temp = float(request.form['start_temp'])
@@ -103,7 +103,7 @@ def get_parameters():
     if mode == "as_the_crow_flies":
         matrix = tsp.distance_matrix2(coords, id_list)
     elif mode == "roads":
-        matrix = tsp.road_matrix(coords, id_list)
+        matrix = tsp.road_matrix(polyline_dict, id_list)
     elif mode == "airline":
         matrix = tsp.air_matrix(coords, id_list)
     else:
@@ -165,22 +165,22 @@ def convert_tour_to_city(best):
         city_list.append(nodes[city-1].city)
     return city_list
 
-def poly_line_tour(best):
-    '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
-    which is a list of polylines [line1, line2 .... linex] for 48 cities best
-    includes each of the nodes from 0 to 47 once.'''
+# def poly_line_tour(best):
+#     '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
+#     which is a list of polylines [line1, line2 .... linex] for 48 cities best
+#     includes each of the nodes from 0 to 47 once.'''
 
-    poly_list = []
-    for i in range(len(best)):
-        city1 = best[i]
-        city2 = best[(i+1)%len(best)]
-        #This may be why it is running slow. Hard code? Change database??
-        distance = model.session.query(model.Distance).filter_by(city1_id = city1).filter_by(city2_id = city2).first()
+#     poly_list = []
+#     for i in range(len(best)):
+#         city1 = best[i]
+#         city2 = best[(i+1)%len(best)]
 
-        polyline = distance.polyline
-        poly_list.append(polyline)
+#         distance = model.session.query(model.Distance).filter_by(city1_id = city1).filter_by(city2_id = city2).first()
 
-    return poly_list
+#         polyline = distance.polyline
+#         poly_list.append(polyline)
+
+#     return poly_list
 
 def poly_line_tour2(best):
     '''input best which is a list of nodes [i, j, k, l ... z] and return poly_list
@@ -189,19 +189,19 @@ def poly_line_tour2(best):
     poly_list = []
     global polyline_dict
 
-    step_in = time.time()#step into the loop
+    #step_in = time.time()#step into the loop
     for i in range(len(best)):
         city1 = best[i]
         city2 = best[(i+1)%len(best)]
         lookup_string = str(city1)+'-'+str(city2)
         before_data_call = time.time()
-        polyline = polyline_dict[lookup_string]        
+        polyline = polyline_dict[lookup_string][0]       
         after_data_call = time.time()
         total_data_call += (-before_data_call+after_data_call)
         
         
         poly_list.append(polyline)
-    step_out = time.time()
+    #step_out = time.time()
     # print "returning each polyline tour2", (step_out - step_in)
     # print "total data call =", total_data_call
     return (poly_list, total_data_call)
