@@ -29,10 +29,9 @@ def build_file():
     distance = model.session.query(model.Distance).all()
     time1 = time.time()
     for i in range(len(distance)):
-        for j in range(len(distance)):
-            key = str(distance[i].city1_id)+"-"+str(distance[i].city2_id)
-            value = distance[i].polyline
-            polyline_dict[key]=value
+        key = str(distance[i].city1_id)+"-"+str(distance[i].city2_id)
+        value = distance[i].polyline
+        polyline_dict[key]=value
     time2 = time.time()
     print "Cost to build table", (time2-time1)
 

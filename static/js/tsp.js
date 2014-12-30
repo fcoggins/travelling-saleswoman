@@ -14,7 +14,6 @@ var cities_string = "";
 
 $(document).ready(function () {
 google.maps.event.addDomListener(window, 'load', initialize);
-
 //make info boxes draggable
 $(function() {
     $( "#intro" ).draggable();
@@ -42,6 +41,7 @@ $( window ).scroll(function() {
 
 
 window.setTimeout(show_intro(), 100);
+
 $("#continue").on("click", begin);
 $("#new").on("click", new_tour);
 $("#drop").on("click", handleCitiesForm);

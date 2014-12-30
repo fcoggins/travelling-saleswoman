@@ -61,7 +61,7 @@ class Distance(Base):
 def connect():
     global ENGINE
     global Session
-
+## Original database with no indexing at tsp, indexed database at tsp2
     DATABASE_URL = os.environ.get("DATABASE_URL","postgresql:///tsp")
     ENGINE = create_engine(DATABASE_URL, echo = True)
     Session = sessionmaker(bind=ENGINE)
