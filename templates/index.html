@@ -182,19 +182,19 @@
               cosines to approximate the curvature of the earth.</p></li>
             <li>Drive
             <p>The Google Directions API was used to find the best route between two
-              cities. The JSON request sent latitude and longitude for the city and the
+              cities. The JSON request sent latitude and longitude for the city. The
               returned data included total road distance between the endpoints and 
-              encoded polyline data to use for drawing the route. This information was
-              stored into a SQLite database and at runtime pulled into a python shelf 
-              to improve runtime.</p></li>
+              encoded polyline data to use for drawing the route and is stored in 
+              a PostgreSQL database. Thredaing is used to load data in the background 
+              at runtime.</p></li>
             <p>Results show total tour miles and tour cost assuming $.56 per mile to
               drive and $30/hour for our saleswomn's time.
             <li>Fly Commercial
               <p>Google's QPX Express API was queried for December 15, 2014 and the 10
                 least expensive routes were returned. The cost and time for each of
-                the 10 options was stored in the SQLite database. At run time the best
-                option was selected based on the optimum combination of fare and time. This
-                weight was applied to the edges for the optimization. The distance matrix
+                the 10 options was stored in the PostgreSQL database. At run time, the best
+                option is selected based on the optimum combination of fare and time. This
+                weight was applied to the edges for optimization. The distance matrix
                 in this mode is not symetric since the cost from city A to B does not necessarily
                 equal the cost from city B to A.</p>
               <p>Total cost was calculated by adding the fares for the tour and the 
@@ -261,6 +261,7 @@
             <li>Add ability to select a subset of cities from a select list or by
               clicking directly on the map</li>
             <li>Add the Air route data</li>
+          </ul>
         </div>
 
 
