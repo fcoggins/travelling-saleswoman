@@ -15,7 +15,7 @@ utilizing Directions from Google Directions API and Flight data from Google's QP
 <li>Google Maps API</li>
 <li>Google Directions API</li>
 <li>QPX Express API</li>
-<li>SQLite/SQLAlchemy</li>
+<li>PostgrSQL/SQLAlchemy</li>
 <li>Javascript/JQuery/JQuery UI</li>
 <li>HTML/CSS/Bootstrap</li>
 </ul>
