@@ -38,7 +38,7 @@ utilizing Directions from Google Directions API and Flight data from Google's QP
   cities. The JSON request sent latitude and longitude for the city. The
   returned data included total road distance between the endpoints and 
   encoded polyline data to use for drawing the route and is stored in 
-  a PostgreSQL database. Thredaing is used to load data in the background 
+  a PostgreSQL database. Threading is used to load data in the background 
   at runtime.</p></li>
 <p>Results show total tour miles and tour cost assuming $.56 per mile to
   drive and $30/hour for our saleswomn's time.
